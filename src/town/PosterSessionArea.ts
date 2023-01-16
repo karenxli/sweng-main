@@ -104,6 +104,11 @@ export default class PosterSessionArea extends InteractableArea {
     mapObject: ITiledMapObject,
     townEmitter: TownEmitter,
   ): PosterSessionArea {
-    throw new Error('Not implemented');
+  const { name, width, height } = mapObject;
+    if (!width || !height) {
+      throw new Error(`Malformed viewing area ${name}`);
+    }
+    const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
+    return new PosterSessionArea({id: name, stars: 0}, rect, townEmitter);
   }
 }
