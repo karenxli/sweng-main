@@ -130,10 +130,14 @@ export default class Town {
       this._connectedSockets.delete(socket);
     });
 
+    // PART 1
     // Set up a listener to forward all chat messages to all clients in the same interactableArea as the player,
     // and only if the message has the same interactable id as the player
     socket.on('chatMessage', (message: ChatMessage) => {
-      // fill in
+      if(message.interactableId === newPlayer.id) {
+
+      }
+
     });
 
     // Register an event listener for the client socket: if the client updates their

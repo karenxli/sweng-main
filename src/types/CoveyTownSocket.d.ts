@@ -1,4 +1,5 @@
 import { BroadcastOperator, Socket } from 'socket.io';
+import InteractableArea from '../town/InteractableArea';
 
 export type TownJoinResponse = {
   /** Unique ID that represents this player * */

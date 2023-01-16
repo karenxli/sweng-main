@@ -6,20 +6,28 @@ import {
   PosterSessionArea as PosterSessionAreaModel,
 } from '../types/CoveyTownSocket';
 import InteractableArea from './InteractableArea';
+import e from 'express';
 
 export default class PosterSessionArea extends InteractableArea {
   // add fields
-  public get stars() {
-    throw new Error('Not implemented');
+  private _poster?: string;
+  private _stars: number;
+  private _title?: string;
+
+
+  public get getStars() {
+    return this._stars;
   }
 
-  public get title() {
-    throw new Error('Not implemented');
+  public get getTitle() {
+    return this._title;
   }
 
-  public get imageContents() {
-    throw new Error('Not implemented');
+  public get getImageContents() {
+    return this._poster;
   }
+
+
 
   /**
    * Creates a new PosterSessionArea
@@ -32,9 +40,17 @@ export default class PosterSessionArea extends InteractableArea {
     { id, stars, imageContents, title }: PosterSessionAreaModel,
     coordinates: BoundingBox,
     townEmitter: TownEmitter,
+
   ) {
     super(id, coordinates, townEmitter);
+    // extends Interactable Area
     // fill in
+    this._poster = imageContents;
+    if(stars < 0) {
+      throw new Error("Invalid number of stars!");
+    }
+    else this._stars = stars;
+    this._title = title;
   }
 
   /**
@@ -45,7 +61,13 @@ export default class PosterSessionArea extends InteractableArea {
    * @param player
    */
   public remove(player: Player): void {
-    throw new Error('Not implemented');
+    super.remove(player);
+    if (this._occupants.length === 0) {
+      this._stars = 0;
+      this._poster = undefined;
+      this._title = undefined;
+      this._emitAreaChanged();
+    }
   }
 
   /**
@@ -54,7 +76,9 @@ export default class PosterSessionArea extends InteractableArea {
    * @param posterSessionArea updated model
    */
   public updateModel(updatedModel: PosterSessionAreaModel) {
-    throw new Error('Not implemented');
+    this._poster = updatedModel.imageContents;
+    this._stars = updatedModel.stars;
+    this._title = updatedModel.title;
   }
 
   /**
@@ -62,7 +86,12 @@ export default class PosterSessionArea extends InteractableArea {
    * transporting over a socket to a client (i.e., serializable).
    */
   public toModel(): PosterSessionAreaModel {
-    throw new Error('Not implemented');
+    return {
+      id: this.id,
+      stars: this._stars,
+      imageContents: this._poster,
+      title: this._title
+    };
   }
 
   /**
