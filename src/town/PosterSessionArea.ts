@@ -9,25 +9,28 @@ import InteractableArea from './InteractableArea';
 import e from 'express';
 
 export default class PosterSessionArea extends InteractableArea {
+
   // add fields
   private _poster?: string;
   private _stars: number;
   private _title?: string;
 
+  private _coordinates: BoundingBox;
+  /* An emitter that can be used to broadcast messages to all players in this town */
+  private _townEmitter: TownEmitter;
 
-  public get getStars() {
+
+  public get stars() {
     return this._stars;
   }
 
-  public get getTitle() {
+  public get title() {
     return this._title;
   }
 
-  public get getImageContents() {
+  public get imageContents() {
     return this._poster;
   }
-
-
 
   /**
    * Creates a new PosterSessionArea
@@ -51,6 +54,8 @@ export default class PosterSessionArea extends InteractableArea {
     }
     else this._stars = stars;
     this._title = title;
+    this._coordinates = coordinates;
+    this._townEmitter = townEmitter;
   }
 
   /**

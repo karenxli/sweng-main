@@ -163,7 +163,7 @@ export class TownsController extends Controller {
       throw new InvalidParametersError('Invalid values specified');
     }
   }
-
+  // FILL IN
   /**
    * Creates a poster session area in a given town
    *
@@ -182,7 +182,17 @@ export class TownsController extends Controller {
     @Header('X-Session-Token') sessionToken: string,
     @Body() requestBody: PosterSessionAreaModel,
   ): Promise<void> {
-    throw new Error('Not implemented');
+    const town = this._townsStore.getTownByID(townID);
+    if (!town) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+    if (!town?.getPlayerBySessionToken(sessionToken)) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+    const success = town.addPosterSessionArea(requestBody);
+    if (!success) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
   }
 
   /**

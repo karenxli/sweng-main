@@ -68,6 +68,9 @@ export default class Town {
     return this._interactables;
   }
 
+  //get posterSession(): PosterSessionArea[] {
+  //  return this.interactables.filter(typeof InteractableArea === PosterSessionArea );
+ // }
   /** The list of players currently in the town * */
   private _players: Player[] = [];
 
@@ -283,6 +286,7 @@ export default class Town {
     return true;
   }
 
+  // FILL IN
   /**
    * Creates a new poster session area in this town if there is not currently an active
    * poster session area with the same ID. The poster session area ID must match the name of a
@@ -301,7 +305,41 @@ export default class Town {
    * with the specified ID or if there is no poster image and title specified
    */
   public addPosterSessionArea(posterSessionArea: PosterSessionAreaModel): boolean {
-    throw new Error('Not implemented');
+    /** 
+    const posterIds = <PosterSessionArea[]><unknown>this._interactables;
+    
+    const match = posterIds.find(PosterSessionArea => PosterSessionArea.id === posterSessionArea.id);
+    // poster session area with the specified ID
+    if(match === undefined) {
+      return false;
+    }
+    else {
+      if(match?.isActive || match.title === undefined && match.imageContents === undefined) {
+        return false;
+      }
+      else {
+        // create the poster 
+        const newId = posterSessionArea.id;
+        const newImage = posterSessionArea.imageContents;
+        const newStars = posterSessionArea.stars;
+        const newTitle = posterSessionArea.title;
+
+        const newPoster = new PosterSessionAreaModel(newId, newStars, newImage, newTitle);
+        return true;
+      }
+    }*/
+
+    const area = this._interactables.find(
+      eachArea => eachArea.id === posterSessionArea.id
+    ) as unknown as PosterSessionArea;
+    if (!area || area.title === undefined || !area.imageContents === undefined) {
+      return false;
+    }
+    area.updateModel(posterSessionArea);
+    area.addPlayersWithinBounds(this._players);
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    return true;
+
   }
 
   /**
