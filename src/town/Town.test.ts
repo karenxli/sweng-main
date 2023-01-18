@@ -538,15 +538,15 @@ describe('Town', () => {
           expect(lastUpdate).toEqual(newArea);
         });
         it('Should not emit interactableUpdate events to players directly, or to the whole town', () => {
-          expect(() => 
-          getLastEmittedEvent(playerTestData.socket, 'interactableUpdate'),
+          expect(() =>
+            getLastEmittedEvent(playerTestData.socket, 'interactableUpdate'),
           ).toThrowError();
           expect(() => getLastEmittedEvent(townEmitter, 'interactableUpdate')).toThrowError();
-          expect(() => 
-          getLastEmittedEvent(secondPlayer.socket, 'interactableUpdate'),
+          expect(() =>
+            getLastEmittedEvent(secondPlayer.socket, 'interactableUpdate'),
           ).toThrowError();
-          expect(() => 
-          getLastEmittedEvent(secondPlayer.socketToRoomMock, 'interactableUpdate'),
+          expect(() =>
+            getLastEmittedEvent(secondPlayer.socketToRoomMock, 'interactableUpdate'),
           ).toThrowError();
         });
       });
@@ -715,10 +715,12 @@ describe('Town', () => {
       ).toEqual(false);
     });
     it('Should return false if the requested topic is empty', () => {
-      expect(town.addConversationArea({ id: 'Name1', topic: '', occupantsByID: [] })
-      ).toEqual(false);
-      expect(town.addConversationArea({ id: 'Name1', topic: '', occupantsByID: [] })
-      ).toEqual(false);
+      expect(town.addConversationArea({ id: 'Name1', topic: '', occupantsByID: [] })).toEqual(
+        false,
+      );
+      expect(town.addConversationArea({ id: 'Name1', topic: '', occupantsByID: [] })).toEqual(
+        false,
+      );
     });
     it('Should return false if the area already has a topic', () => {
       expect(
@@ -741,7 +743,7 @@ describe('Town', () => {
       beforeEach(() => {
         playerTestData.moveTo(45, 122); // Inside of "Name1" area
         expect(
-          town.addConversationArea({id: 'Name1', topic: newTopic, occupantsByID: [],})
+          town.addConversationArea({ id: 'Name1', topic: newTopic, occupantsByID: [] }),
         ).toEqual(true);
       });
       it('Should update the local model for that area', () => {
