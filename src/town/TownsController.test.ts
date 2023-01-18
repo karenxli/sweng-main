@@ -31,7 +31,7 @@ interface TestTownData {
 }
 
 function expectTownListMatches(towns: Town[], town: TestTownData) {
-  const matching = towns.find((townInfo) => townInfo.townID === town.townID);
+  const matching = towns.find(townInfo => townInfo.townID === town.townID);
   if (town.isPubliclyListed) {
     expect(matching).toBeDefined();
     assert(matching);
@@ -45,13 +45,10 @@ const broadcastEmitter = jest.fn();
 describe('TownsController integration tests', () => {
   let controller: TownsController;
 
-  const createdTownEmitters: Map<
-    string,
-    DeepMockProxy<TownEmitter>
-  > = new Map();
+  const createdTownEmitters: Map<string, DeepMockProxy<TownEmitter>> = new Map();
   async function createTownForTesting(
     friendlyNameToUse?: string,
-    isPublic = false
+    isPublic = false,
   ): Promise<TestTownData> {
     const friendlyName =
       friendlyNameToUse !== undefined
@@ -121,15 +118,9 @@ describe('TownsController integration tests', () => {
     });
     it('Allows for multiple towns with the same friendlyName', async () => {
       const pubTown1 = await createTownForTesting(undefined, true);
-      const privTown1 = await createTownForTesting(
-        pubTown1.friendlyName,
-        false
-      );
+      const privTown1 = await createTownForTesting(pubTown1.friendlyName, false);
       const pubTown2 = await createTownForTesting(pubTown1.friendlyName, true);
-      const privTown2 = await createTownForTesting(
-        pubTown1.friendlyName,
-        false
-      );
+      const privTown2 = await createTownForTesting(pubTown1.friendlyName, false);
 
       const towns = await controller.listTowns();
       expectTownListMatches(towns, pubTown1);
@@ -142,24 +133,14 @@ describe('TownsController integration tests', () => {
   describe('deleteTown', () => {
     it('Throws an error if the password is invalid', async () => {
       const { townID } = await createTownForTesting(undefined, true);
-      await expect(
-        controller.deleteTown(townID, nanoid())
-      ).rejects.toThrowError();
+      await expect(controller.deleteTown(townID, nanoid())).rejects.toThrowError();
     });
     it('Throws an error if the townID is invalid', async () => {
-      const { townUpdatePassword } = await createTownForTesting(
-        undefined,
-        true
-      );
-      await expect(
-        controller.deleteTown(nanoid(), townUpdatePassword)
-      ).rejects.toThrowError();
+      const { townUpdatePassword } = await createTownForTesting(undefined, true);
+      await expect(controller.deleteTown(nanoid(), townUpdatePassword)).rejects.toThrowError();
     });
     it('Deletes a town if given a valid password and town, no longer allowing it to be joined or listed', async () => {
-      const { townID, townUpdatePassword } = await createTownForTesting(
-        undefined,
-        true
-      );
+      const { townID, townUpdatePassword } = await createTownForTesting(undefined, true);
       await controller.deleteTown(townID, townUpdatePassword);
 
       const { socket } = mockPlayer(townID);
@@ -168,7 +149,7 @@ describe('TownsController integration tests', () => {
       expect(socket.disconnect).toHaveBeenCalled();
 
       const listedTowns = await controller.listTowns();
-      if (listedTowns.find((r) => r.townID === townID) != null) {
+      if (listedTowns.find(r => r.townID === townID) != null) {
         fail('Expected the deleted town to no longer be listed');
       }
     });
@@ -179,14 +160,14 @@ describe('TownsController integration tests', () => {
           const player = mockPlayer(town.townID);
           await controller.joinTown(player.socket);
           return player;
-        })
+        }),
       );
       const townEmitter = getBroadcastEmitterForTownID(town.townID);
       await controller.deleteTown(town.townID, town.townUpdatePassword);
       getLastEmittedEvent(townEmitter, 'townClosing');
       // extractLastCallToEmit will throw an error if no townClosing was emitted
 
-      players.forEach((eachPlayer) => {
+      players.forEach(eachPlayer => {
         expect(eachPlayer.socket.disconnect).toBeCalledWith(true);
       });
     });
@@ -196,14 +177,10 @@ describe('TownsController integration tests', () => {
       const pubTown1 = await createTownForTesting(undefined, true);
       expectTownListMatches(await controller.listTowns(), pubTown1);
       await expect(
-        controller.updateTown(
-          pubTown1.townID,
-          `${pubTown1.townUpdatePassword}*`,
-          {
-            friendlyName: 'broken',
-            isPubliclyListed: false,
-          }
-        )
+        controller.updateTown(pubTown1.townID, `${pubTown1.townUpdatePassword}*`, {
+          friendlyName: 'broken',
+          isPubliclyListed: false,
+        }),
       ).rejects.toThrowError();
 
       // Make sure name or vis didn't change
@@ -212,14 +189,10 @@ describe('TownsController integration tests', () => {
     it('Updates the friendlyName and visbility as requested', async () => {
       const pubTown1 = await createTownForTesting(undefined, false);
       expectTownListMatches(await controller.listTowns(), pubTown1);
-      await controller.updateTown(
-        pubTown1.townID,
-        pubTown1.townUpdatePassword,
-        {
-          friendlyName: 'newName',
-          isPubliclyListed: true,
-        }
-      );
+      await controller.updateTown(pubTown1.townID, pubTown1.townUpdatePassword, {
+        friendlyName: 'newName',
+        isPubliclyListed: true,
+      });
       pubTown1.friendlyName = 'newName';
       pubTown1.isPubliclyListed = true;
       expectTownListMatches(await controller.listTowns(), pubTown1);
@@ -229,7 +202,7 @@ describe('TownsController integration tests', () => {
         controller.updateTown(nanoid(), nanoid(), {
           friendlyName: 'test',
           isPubliclyListed: true,
-        })
+        }),
       ).rejects.toThrow();
     });
   });
@@ -272,25 +245,23 @@ describe('TownsController integration tests', () => {
       const conversationArea = createConversationForTesting({
         boundingBox: { x: 10, y: 10, width: 1, height: 1 },
         conversationID: initialData.interactables.find(
-          (eachInteractable) => 'occupantsByID' in eachInteractable
+          eachInteractable => 'occupantsByID' in eachInteractable,
         )?.id,
       });
       await controller.createConversationArea(
         town.townID,
         extractSessionToken(player),
-        conversationArea
+        conversationArea,
       );
 
       const player2 = mockPlayer(town.townID);
       await controller.joinTown(player2.socket);
       const initialData2 = getLastEmittedEvent(player2.socket, 'initialize');
       const createdArea = initialData2.interactables.find(
-        (eachInteractable) => eachInteractable.id === conversationArea.id
+        eachInteractable => eachInteractable.id === conversationArea.id,
       ) as ConversationArea;
       expect(createdArea.topic).toEqual(conversationArea.topic);
-      expect(initialData2.interactables.length).toEqual(
-        initialData.interactables.length
-      );
+      expect(initialData2.interactables.length).toEqual(initialData.interactables.length);
     });
   });
   describe('Interactables', () => {
@@ -314,16 +285,12 @@ describe('TownsController integration tests', () => {
           sessionToken,
           createConversationForTesting({
             conversationID: interactables.find(isConversationArea)?.id,
-          })
+          }),
         );
       });
       it('Returns an error message if the town ID is invalid', async () => {
         await expect(
-          controller.createConversationArea(
-            nanoid(),
-            sessionToken,
-            createConversationForTesting()
-          )
+          controller.createConversationArea(nanoid(), sessionToken, createConversationForTesting()),
         ).rejects.toThrow();
       });
       it('Checks for a valid session token before creating a conversation area', async () => {
@@ -334,18 +301,14 @@ describe('TownsController integration tests', () => {
           controller.createConversationArea(
             testingTown.townID,
             invalidSessionToken,
-            conversationArea
-          )
+            conversationArea,
+          ),
         ).rejects.toThrow();
       });
       it('Returns an error message if addConversation returns false', async () => {
         const conversationArea = createConversationForTesting();
         await expect(
-          controller.createConversationArea(
-            testingTown.townID,
-            sessionToken,
-            conversationArea
-          )
+          controller.createConversationArea(testingTown.townID, sessionToken, conversationArea),
         ).rejects.toThrow();
       });
     });
@@ -354,9 +317,7 @@ describe('TownsController integration tests', () => {
       it('Executes without error when creating a new viewing area', async () => {
         const viewingArea = interactables.find(isViewingArea) as ViewingArea;
         if (!viewingArea) {
-          fail(
-            'Expected at least one viewing area to be returned in the initial join data'
-          );
+          fail('Expected at least one viewing area to be returned in the initial join data');
         } else {
           const newViewingArea: ViewingArea = {
             elapsedTimeSec: 100,
@@ -364,23 +325,14 @@ describe('TownsController integration tests', () => {
             video: nanoid(),
             isPlaying: true,
           };
-          await controller.createViewingArea(
-            testingTown.townID,
-            sessionToken,
-            newViewingArea
-          );
+          await controller.createViewingArea(testingTown.townID, sessionToken, newViewingArea);
           // Check to see that the viewing area was successfully updated
           const townEmitter = getBroadcastEmitterForTownID(testingTown.townID);
-          const updateMessage = getLastEmittedEvent(
-            townEmitter,
-            'interactableUpdate'
-          );
+          const updateMessage = getLastEmittedEvent(townEmitter, 'interactableUpdate');
           if (isViewingArea(updateMessage)) {
             expect(updateMessage).toEqual(newViewingArea);
           } else {
-            fail(
-              'Expected an interactableUpdate to be dispatched with the new viewing area'
-            );
+            fail('Expected an interactableUpdate to be dispatched with the new viewing area');
           }
         }
       });
@@ -393,7 +345,7 @@ describe('TownsController integration tests', () => {
           isPlaying: true,
         };
         await expect(
-          controller.createViewingArea(nanoid(), sessionToken, newViewingArea)
+          controller.createViewingArea(nanoid(), sessionToken, newViewingArea),
         ).rejects.toThrow();
       });
       it('Checks for a valid session token before creating a viewing area', async () => {
@@ -406,35 +358,23 @@ describe('TownsController integration tests', () => {
           isPlaying: true,
         };
         await expect(
-          controller.createViewingArea(
-            testingTown.townID,
-            invalidSessionToken,
-            newViewingArea
-          )
+          controller.createViewingArea(testingTown.townID, invalidSessionToken, newViewingArea),
         ).rejects.toThrow();
       });
       it('Returns an error message if addViewingArea returns false', async () => {
         const viewingArea = interactables.find(isViewingArea) as ViewingArea;
         viewingArea.id = nanoid();
         await expect(
-          controller.createViewingArea(
-            testingTown.townID,
-            sessionToken,
-            viewingArea
-          )
+          controller.createViewingArea(testingTown.townID, sessionToken, viewingArea),
         ).rejects.toThrow();
       });
     });
 
     describe('[T2] Create Poster Session Area', () => {
       it('Executes without error when creating a new poster area', async () => {
-        const posterArea = interactables.find(
-          isPosterSessionArea
-        ) as PosterSessionArea;
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
         if (!posterArea) {
-          fail(
-            'Expected at least one poster area to be returned in the initial join data'
-          );
+          fail('Expected at least one poster area to be returned in the initial join data');
         } else {
           const newPosterArea: PosterSessionArea = {
             id: posterArea.id,
@@ -442,30 +382,19 @@ describe('TownsController integration tests', () => {
             imageContents: 'sss',
             title: nanoid(),
           };
-          await controller.createPosterSessionArea(
-            testingTown.townID,
-            sessionToken,
-            newPosterArea
-          );
+          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
           // Check to see that the viewing area was successfully updated
           const townEmitter = getBroadcastEmitterForTownID(testingTown.townID);
-          const updateMessage = getLastEmittedEvent(
-            townEmitter,
-            'interactableUpdate'
-          );
+          const updateMessage = getLastEmittedEvent(townEmitter, 'interactableUpdate');
           if (isPosterSessionArea(updateMessage)) {
             expect(updateMessage).toEqual(newPosterArea);
           } else {
-            fail(
-              'Expected an interactableUpdate to be dispatched with the new poster area'
-            );
+            fail('Expected an interactableUpdate to be dispatched with the new poster area');
           }
         }
       });
       it('Returns an error message if the town ID is invalid', async () => {
-        const posterArea = interactables.find(
-          isPosterSessionArea
-        ) as PosterSessionArea;
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
         const newPosterArea: PosterSessionArea = {
           id: posterArea.id,
           stars: 0,
@@ -473,18 +402,12 @@ describe('TownsController integration tests', () => {
           title: nanoid(),
         };
         await expect(
-          controller.createPosterSessionArea(
-            nanoid(),
-            sessionToken,
-            newPosterArea
-          )
+          controller.createPosterSessionArea(nanoid(), sessionToken, newPosterArea),
         ).rejects.toThrow();
       });
       it('Checks for a valid session token before creating a poster area', async () => {
         const invalidSessionToken = nanoid();
-        const posterArea = interactables.find(
-          isPosterSessionArea
-        ) as PosterSessionArea;
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
         const newPosterArea: PosterSessionArea = {
           id: posterArea.id,
           stars: 0,
@@ -492,36 +415,22 @@ describe('TownsController integration tests', () => {
           title: nanoid(),
         };
         await expect(
-          controller.createPosterSessionArea(
-            nanoid(),
-            invalidSessionToken,
-            newPosterArea
-          )
+          controller.createPosterSessionArea(nanoid(), invalidSessionToken, newPosterArea),
         ).rejects.toThrow();
       });
       it('Returns an error message if addPosterArea returns false', async () => {
-        const posterArea = interactables.find(
-          isPosterSessionArea
-        ) as PosterSessionArea;
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
         posterArea.id = nanoid();
         await expect(
-          controller.createPosterSessionArea(
-            testingTown.townID,
-            sessionToken,
-            posterArea
-          )
+          controller.createPosterSessionArea(testingTown.townID, sessionToken, posterArea),
         ).rejects.toThrow();
       });
     });
     describe('[T3] Get Poster Image Contents', () => {
       it('Executes without error when creating a new poster area', async () => {
-        const posterArea = interactables.find(
-          isPosterSessionArea
-        ) as PosterSessionArea;
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
         if (!posterArea) {
-          fail(
-            'Expected at least one poster area to be returned in the initial join data'
-          );
+          fail('Expected at least one poster area to be returned in the initial join data');
         } else {
           const newPosterArea: PosterSessionArea = {
             id: posterArea.id,
@@ -529,64 +438,37 @@ describe('TownsController integration tests', () => {
             imageContents: 'sss',
             title: nanoid(),
           };
-          await controller.createPosterSessionArea(
-            testingTown.townID,
-            sessionToken,
-            newPosterArea
-          );
+          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
           // Check to see that the viewing area was successfully updated
           const townEmitter = getBroadcastEmitterForTownID(testingTown.townID);
-          const updateMessage = getLastEmittedEvent(
-            townEmitter,
-            'interactableUpdate'
-          );
+          const updateMessage = getLastEmittedEvent(townEmitter, 'interactableUpdate');
           if (isPosterSessionArea(updateMessage)) {
             expect(updateMessage).toEqual(newPosterArea);
           } else {
-            fail(
-              'Expected an interactableUpdate to be dispatched with the new poster area'
-            );
+            fail('Expected an interactableUpdate to be dispatched with the new poster area');
           }
         }
       });
       // this stays the same
       it('Returns an error message if the town ID is invalid', async () => {
-        const posterArea = interactables.find(
-          isPosterSessionArea
-        ) as PosterSessionArea;
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
         await expect(
-          controller.getPosterAreaImageContents(
-            nanoid(),
-            posterArea.id,
-            sessionToken
-          )
+          controller.getPosterAreaImageContents(nanoid(), posterArea.id, sessionToken),
         ).rejects.toThrow();
       });
       it('Checks for a valid session token before fetching the poster contents', async () => {
         const invalidSessionToken = nanoid();
-        const posterArea = interactables.find(
-          isPosterSessionArea
-        ) as PosterSessionArea;
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
 
         await expect(
-          controller.getPosterAreaImageContents(
-            nanoid(),
-            posterArea.id,
-            invalidSessionToken
-          )
+          controller.getPosterAreaImageContents(nanoid(), posterArea.id, invalidSessionToken),
         ).rejects.toThrow();
       });
       it('Returns an error message if addPosterArea returns false', async () => {
-        const posterArea = interactables.find(
-          isPosterSessionArea
-        ) as PosterSessionArea;
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
         posterArea.id = nanoid();
         await expect(
-          controller.createPosterSessionArea(
-            testingTown.townID,
-            sessionToken,
-            posterArea
-          )
+          controller.createPosterSessionArea(testingTown.townID, sessionToken, posterArea),
         ).rejects.toThrow();
       });
     });

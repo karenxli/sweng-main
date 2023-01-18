@@ -3,6 +3,7 @@ module.exports = {
   tabWidth: 2,
   useTabs: false,
   semi: true,
+  singleQuote: true,
   quoteProps: 'consistent',
   jsxSingleQuote: true,
   singleQuote: true,
@@ -12,5 +13,5 @@ module.exports = {
   arrowParens: 'avoid',
   proseWrap: 'always',
   htmlWhitespaceSensitivity: 'ignore',
-  endOfLine: 'lf'
-}
+  endOfLine: 'auto',
+};

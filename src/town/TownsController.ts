@@ -59,13 +59,11 @@ export class TownsController extends Controller {
     townUpdatePassword: 'secretPassword',
   })
   @Post()
-  public async createTown(
-    @Body() request: TownCreateParams
-  ): Promise<TownCreateResponse> {
+  public async createTown(@Body() request: TownCreateParams): Promise<TownCreateResponse> {
     const { townID, townUpdatePassword } = await this._townsStore.createTown(
       request.friendlyName,
       request.isPubliclyListed,
-      request.mapFile
+      request.mapFile,
     );
     return {
       townID,
@@ -81,25 +79,20 @@ export class TownsController extends Controller {
    * @param requestBody The updated settings
    */
   @Patch('{townID}')
-  @Response<InvalidParametersError>(
-    400,
-    'Invalid password or update values specified'
-  )
+  @Response<InvalidParametersError>(400, 'Invalid password or update values specified')
   public async updateTown(
     @Path() townID: string,
     @Header('X-CoveyTown-Password') townUpdatePassword: string,
-    @Body() requestBody: TownSettingsUpdate
+    @Body() requestBody: TownSettingsUpdate,
   ): Promise<void> {
     const success = this._townsStore.updateTown(
       townID,
       townUpdatePassword,
       requestBody.friendlyName,
-      requestBody.isPubliclyListed
+      requestBody.isPubliclyListed,
     );
     if (!success) {
-      throw new InvalidParametersError(
-        'Invalid password or update values specified'
-      );
+      throw new InvalidParametersError('Invalid password or update values specified');
     }
   }
 
@@ -109,19 +102,14 @@ export class TownsController extends Controller {
    * @param townUpdatePassword town update password, must match the password returned by createTown
    */
   @Delete('{townID}')
-  @Response<InvalidParametersError>(
-    400,
-    'Invalid password or update values specified'
-  )
+  @Response<InvalidParametersError>(400, 'Invalid password or update values specified')
   public async deleteTown(
     @Path() townID: string,
-    @Header('X-CoveyTown-Password') townUpdatePassword: string
+    @Header('X-CoveyTown-Password') townUpdatePassword: string,
   ): Promise<void> {
     const success = this._townsStore.deleteTown(townID, townUpdatePassword);
     if (!success) {
-      throw new InvalidParametersError(
-        'Invalid password or update values specified'
-      );
+      throw new InvalidParametersError('Invalid password or update values specified');
     }
   }
 
@@ -136,7 +124,7 @@ export class TownsController extends Controller {
   public async createConversationArea(
     @Path() townID: string,
     @Header('X-Session-Token') sessionToken: string,
-    @Body() requestBody: ConversationArea
+    @Body() requestBody: ConversationArea,
   ): Promise<void> {
     const town = this._townsStore.getTownByID(townID);
     if (!town?.getPlayerBySessionToken(sessionToken)) {
@@ -164,7 +152,7 @@ export class TownsController extends Controller {
   public async createViewingArea(
     @Path() townID: string,
     @Header('X-Session-Token') sessionToken: string,
-    @Body() requestBody: ViewingArea
+    @Body() requestBody: ViewingArea,
   ): Promise<void> {
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
@@ -196,7 +184,7 @@ export class TownsController extends Controller {
   public async createPosterSessionArea(
     @Path() townID: string,
     @Header('X-Session-Token') sessionToken: string,
-    @Body() requestBody: PosterSessionAreaModel
+    @Body() requestBody: PosterSessionAreaModel,
   ): Promise<void> {
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
@@ -228,7 +216,7 @@ export class TownsController extends Controller {
   public async getPosterAreaImageContents(
     @Path() townID: string,
     @Path() posterSessionId: string,
-    @Header('X-Session-Token') sessionToken: string
+    @Header('X-Session-Token') sessionToken: string,
   ): Promise<string | undefined> {
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
@@ -262,7 +250,7 @@ export class TownsController extends Controller {
   public async incrementPosterAreaStars(
     @Path() townID: string,
     @Path() posterSessionId: string,
-    @Header('X-Session-Token') sessionToken: string
+    @Header('X-Session-Token') sessionToken: string,
   ): Promise<number> {
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
@@ -271,17 +259,11 @@ export class TownsController extends Controller {
     if (!town?.getPlayerBySessionToken(sessionToken)) {
       throw new InvalidParametersError('Invalid values specified');
     }
-    const posterContents = this.getPosterAreaImageContents(
-      townID,
-      posterSessionId,
-      sessionToken
-    );
+    const posterContents = this.getPosterAreaImageContents(townID, posterSessionId, sessionToken);
     if (!posterContents) {
       throw new InvalidParametersError('Invalid values specified');
     } else {
-      const foundPoster = town.getInteractable(
-        posterSessionId
-      ) as unknown as PosterSessionArea;
+      const foundPoster = town.getInteractable(posterSessionId) as unknown as PosterSessionArea;
       foundPoster.incrementStars();
       return foundPoster.stars;
     }
@@ -316,14 +298,10 @@ export class TownsController extends Controller {
       userID: newPlayer.id,
       sessionToken: newPlayer.sessionToken,
       providerVideoToken: newPlayer.videoToken,
-      currentPlayers: town.players.map((eachPlayer) =>
-        eachPlayer.toPlayerModel()
-      ),
+      currentPlayers: town.players.map(eachPlayer => eachPlayer.toPlayerModel()),
       friendlyName: town.friendlyName,
       isPubliclyListed: town.isPubliclyListed,
-      interactables: town.interactables.map((eachInteractable) =>
-        eachInteractable.toModel()
-      ),
+      interactables: town.interactables.map(eachInteractable => eachInteractable.toModel()),
     });
   }
 }

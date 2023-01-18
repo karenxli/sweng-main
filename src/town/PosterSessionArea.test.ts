@@ -18,11 +18,7 @@ describe('PosterSessionArea', () => {
 
   beforeEach(() => {
     mockClear(emitter);
-    area = new PosterSessionArea(
-      { id, stars, title, imageContents },
-      box,
-      emitter
-    );
+    area = new PosterSessionArea({ id, stars, title, imageContents }, box, emitter);
     player = new Player(nanoid(), mock<TownEmitter>());
     area.add(player);
   });
@@ -35,10 +31,7 @@ describe('PosterSessionArea', () => {
       area.remove(player);
 
       expect(area.occupantsByID).toEqual([extraPlayer.id]);
-      const lastEmittedUpdate = getLastEmittedEvent(
-        emitter,
-        'interactableUpdate'
-      );
+      const lastEmittedUpdate = getLastEmittedEvent(emitter, 'interactableUpdate');
       expect(lastEmittedUpdate).toEqual({ id, stars, title, imageContents });
     });
     it("Clears the player's interactableID and emits an update for their location", () => {
@@ -49,10 +42,7 @@ describe('PosterSessionArea', () => {
     });
     it('Clears the poster image and title and sets stars to zero when the last occupant leaves', () => {
       area.remove(player);
-      const lastEmittedUpdate = getLastEmittedEvent(
-        emitter,
-        'interactableUpdate'
-      );
+      const lastEmittedUpdate = getLastEmittedEvent(emitter, 'interactableUpdate');
       expect(lastEmittedUpdate).toEqual({
         id,
         stars: 0,
@@ -104,8 +94,8 @@ describe('PosterSessionArea', () => {
       expect(() =>
         PosterSessionArea.fromMapObject(
           { id: 1, name: nanoid(), visible: true, x: 0, y: 0 },
-          emitter
-        )
+          emitter,
+        ),
       ).toThrowError();
     });
     it('Creates a new poster session area using provided boundingBox and id, with no poster (i.e. title and image undefined, no stars), and emitter', () => {
@@ -116,7 +106,7 @@ describe('PosterSessionArea', () => {
       const name = 'name';
       const val = PosterSessionArea.fromMapObject(
         { x, y, width, height, name, id: 10, visible: true },
-        emitter
+        emitter,
       );
       expect(val.boundingBox).toEqual({ x, y, width, height });
       expect(val.id).toEqual(name);

@@ -44,7 +44,7 @@ export default class PosterSessionArea extends InteractableArea {
   public constructor(
     { id, stars, imageContents, title }: PosterSessionAreaModel,
     coordinates: BoundingBox,
-    townEmitter: TownEmitter
+    townEmitter: TownEmitter,
   ) {
     super(id, coordinates, townEmitter);
     // extends Interactable Area
@@ -113,7 +113,7 @@ export default class PosterSessionArea extends InteractableArea {
    */
   public static fromMapObject(
     mapObject: ITiledMapObject,
-    townEmitter: TownEmitter
+    townEmitter: TownEmitter,
   ): PosterSessionArea {
     const { name, width, height } = mapObject;
     if (!width || !height) {

@@ -26,7 +26,7 @@ export default class TwilioVideo implements IVideoClient {
   private constructor(
     twilioAccountSid: string,
     twilioAPIKeySID: string,
-    twilioAPIKeySecret: string
+    twilioAPIKeySecret: string,
   ) {
     this._twilioAccountSid = twilioAccountSid;
     this._twilioApiKeySID = twilioAPIKeySID;
@@ -38,23 +38,20 @@ export default class TwilioVideo implements IVideoClient {
       TwilioVideo._instance = new TwilioVideo(
         process.env.TWILIO_ACCOUNT_SID || MISSING_TOKEN_NAME,
         process.env.TWILIO_API_KEY_SID || MISSING_TOKEN_NAME,
-        process.env.TWILIO_API_KEY_SECRET || MISSING_TOKEN_NAME
+        process.env.TWILIO_API_KEY_SECRET || MISSING_TOKEN_NAME,
       );
     }
     return TwilioVideo._instance;
   }
 
-  async getTokenForTown(
-    coveyTownID: string,
-    clientIdentity: string
-  ): Promise<string> {
+  async getTokenForTown(coveyTownID: string, clientIdentity: string): Promise<string> {
     if (
       this._twilioAccountSid === MISSING_TOKEN_NAME ||
       this._twilioApiKeySID === MISSING_TOKEN_NAME ||
       this._twilioApiKeySecret === MISSING_TOKEN_NAME
     ) {
       logError(
-        'Twilio tokens missing. Video chat will be disabled, and viewing areas will not work. Please be sure to configure the variables in the townService .env file as described in the README'
+        'Twilio tokens missing. Video chat will be disabled, and viewing areas will not work. Please be sure to configure the variables in the townService .env file as described in the README',
       );
       return MISSING_TOKEN_NAME;
     }
@@ -64,7 +61,7 @@ export default class TwilioVideo implements IVideoClient {
       this._twilioApiKeySecret,
       {
         ttl: MAX_ALLOWED_SESSION_DURATION,
-      }
+      },
     );
     token.identity = clientIdentity;
     const videoGrant = new Twilio.jwt.AccessToken.VideoGrant({

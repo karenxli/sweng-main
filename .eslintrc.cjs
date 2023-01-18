@@ -20,12 +20,10 @@ module.exports = {
       'endOfLine': 'auto',
       'singleQuote': true,
     }],
-    "quotes": [1, "single", { "avoidEscape": true }],
     'no-underscore-dangle': 0,
     'no-param-reassign': 0,
     'no-restricted-syntax': 0,
     'no-plusplus': 0,
-    'consistent-return': 'warn',
     'import/no-extraneous-dependencies': [
       'error',
       { devDependencies: ['**/*.test.ts', '**/TestUtils.ts'] },

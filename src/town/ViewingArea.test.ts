@@ -17,11 +17,7 @@ describe('ViewingArea', () => {
 
   beforeEach(() => {
     mockClear(townEmitter);
-    testArea = new ViewingArea(
-      { id, isPlaying, elapsedTimeSec, video },
-      testAreaBox,
-      townEmitter
-    );
+    testArea = new ViewingArea({ id, isPlaying, elapsedTimeSec, video }, testAreaBox, townEmitter);
     newPlayer = new Player(nanoid(), mock<TownEmitter>());
     testArea.add(newPlayer);
   });
@@ -34,10 +30,7 @@ describe('ViewingArea', () => {
       testArea.remove(newPlayer);
 
       expect(testArea.occupantsByID).toEqual([extraPlayer.id]);
-      const lastEmittedUpdate = getLastEmittedEvent(
-        townEmitter,
-        'interactableUpdate'
-      );
+      const lastEmittedUpdate = getLastEmittedEvent(townEmitter, 'interactableUpdate');
       expect(lastEmittedUpdate).toEqual({
         id,
         isPlaying,
@@ -48,18 +41,12 @@ describe('ViewingArea', () => {
     it("Clears the player's conversationLabel and emits an update for their location", () => {
       testArea.remove(newPlayer);
       expect(newPlayer.location.interactableID).toBeUndefined();
-      const lastEmittedMovement = getLastEmittedEvent(
-        townEmitter,
-        'playerMoved'
-      );
+      const lastEmittedMovement = getLastEmittedEvent(townEmitter, 'playerMoved');
       expect(lastEmittedMovement.location.interactableID).toBeUndefined();
     });
     it('Clears the video property when the last occupant leaves', () => {
       testArea.remove(newPlayer);
-      const lastEmittedUpdate = getLastEmittedEvent(
-        townEmitter,
-        'interactableUpdate'
-      );
+      const lastEmittedUpdate = getLastEmittedEvent(townEmitter, 'interactableUpdate');
       expect(lastEmittedUpdate).toEqual({
         id,
         isPlaying,
@@ -76,10 +63,7 @@ describe('ViewingArea', () => {
     it("Sets the player's conversationLabel and emits an update for their location", () => {
       expect(newPlayer.location.interactableID).toEqual(id);
 
-      const lastEmittedMovement = getLastEmittedEvent(
-        townEmitter,
-        'playerMoved'
-      );
+      const lastEmittedMovement = getLastEmittedEvent(townEmitter, 'playerMoved');
       expect(lastEmittedMovement.location.interactableID).toEqual(id);
     });
   });
@@ -109,8 +93,8 @@ describe('ViewingArea', () => {
       expect(() =>
         ViewingArea.fromMapObject(
           { id: 1, name: nanoid(), visible: true, x: 0, y: 0 },
-          townEmitter
-        )
+          townEmitter,
+        ),
       ).toThrowError();
     });
     it('Creates a new viewing area using the provided boundingBox and id, with isPlaying defaulting to false and progress to 0, and emitter', () => {
@@ -121,7 +105,7 @@ describe('ViewingArea', () => {
       const name = 'name';
       const val = ViewingArea.fromMapObject(
         { x, y, width, height, name, id: 10, visible: true },
-        townEmitter
+        townEmitter,
       );
       expect(val.boundingBox).toEqual({ x, y, width, height });
       expect(val.id).toEqual(name);

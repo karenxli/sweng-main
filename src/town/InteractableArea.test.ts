@@ -2,17 +2,9 @@ import { mock, mockClear } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import Player from '../lib/Player';
 import { defaultLocation, getLastEmittedEvent } from '../TestUtils';
-import {
-  BoundingBox,
-  Interactable,
-  TownEmitter,
-  XY,
-} from '../types/CoveyTownSocket';
+import { BoundingBox, Interactable, TownEmitter, XY } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
-import InteractableArea, {
-  PLAYER_SPRITE_HEIGHT,
-  PLAYER_SPRITE_WIDTH,
-} from './InteractableArea';
+import InteractableArea, { PLAYER_SPRITE_HEIGHT, PLAYER_SPRITE_WIDTH } from './InteractableArea';
 
 class TestInteractableArea extends InteractableArea {
   public toModel(): Interactable {
@@ -42,10 +34,7 @@ describe('InteractableArea', () => {
     it("Sets the player's conversationLabel and emits an update for their location", () => {
       expect(newPlayer.location.interactableID).toEqual(id);
 
-      const lastEmittedMovement = getLastEmittedEvent(
-        townEmitter,
-        'playerMoved'
-      );
+      const lastEmittedMovement = getLastEmittedEvent(townEmitter, 'playerMoved');
       expect(lastEmittedMovement.location.interactableID).toEqual(id);
     });
   });
@@ -58,10 +47,7 @@ describe('InteractableArea', () => {
       mockClear(townEmitter);
       testArea.remove(newPlayer);
       expect(newPlayer.location.interactableID).toBeUndefined();
-      const lastEmittedMovement = getLastEmittedEvent(
-        townEmitter,
-        'playerMoved'
-      );
+      const lastEmittedMovement = getLastEmittedEvent(townEmitter, 'playerMoved');
       expect(lastEmittedMovement.location.interactableID).toBeUndefined();
     });
   });
@@ -99,12 +85,12 @@ describe('InteractableArea', () => {
       testArea.addPlayersWithinBounds(mixedPlayers);
     });
     it('Does not include players not within the area', () => {
-      playersNotInArea.forEach((player) => {
+      playersNotInArea.forEach(player => {
         expect(testArea.occupantsByID.includes(player.id)).toBe(false);
       });
     });
     it('Includes all players that are within the area', () => {
-      playersInArea.forEach((player) => {
+      playersInArea.forEach(player => {
         expect(testArea.occupantsByID.includes(player.id)).toBe(true);
       });
       expect(playersInArea.length).toEqual(playersInArea.length);
@@ -119,18 +105,15 @@ describe('InteractableArea', () => {
       { x: x + 1, y: y + 1 }, // on top left
       { x: x - 1 + width, y: y - 1 + height }, // on bottom right
       { x: x + 1, y: y - 1 + height }, // on bottom left
-    ])(
-      'Returns true for locations that are inside of the area %p',
-      (location: XY) => {
-        expect(
-          testArea.contains({
-            ...defaultLocation(),
-            x: location.x,
-            y: location.y,
-          })
-        ).toBe(true);
-      }
-    );
+    ])('Returns true for locations that are inside of the area %p', (location: XY) => {
+      expect(
+        testArea.contains({
+          ...defaultLocation(),
+          x: location.x,
+          y: location.y,
+        }),
+      ).toBe(true);
+    });
     it.each<XY>([
       { x: x - 1 + HALF_W + width, y: y + 1 - HALF_H }, // on top right
       { x: x + 1 - HALF_W, y: y + 1 - HALF_H }, // on top left
@@ -144,27 +127,24 @@ describe('InteractableArea', () => {
             ...defaultLocation(),
             x: location.x,
             y: location.y,
-          })
+          }),
         ).toBe(true);
-      }
+      },
     );
     it.each<XY>([
       { x: x + HALF_W + width, y: y - HALF_H }, // on top right
       { x: x - HALF_W, y: y - HALF_H }, // on top left
       { x: x + HALF_W + width, y: y + HALF_H + height }, // on bottom right
       { x: x - HALF_W, y: y + HALF_H + height }, // on bottom left
-    ])(
-      'Returns false for locations that exactly hit the edge of the area',
-      (location: XY) => {
-        expect(
-          testArea.contains({
-            ...defaultLocation(),
-            x: location.x,
-            y: location.y,
-          })
-        ).toBe(false);
-      }
-    );
+    ])('Returns false for locations that exactly hit the edge of the area', (location: XY) => {
+      expect(
+        testArea.contains({
+          ...defaultLocation(),
+          x: location.x,
+          y: location.y,
+        }),
+      ).toBe(false);
+    });
     it.each<XY>([
       { x: x + width * 2, y: y - height }, // off top right
       { x: x - width, y: y - width }, // off top left
@@ -174,18 +154,15 @@ describe('InteractableArea', () => {
       { x: x - width, y: y + 1 }, // off left
       { x: x + width * 2, y: y + 1 }, // off right
       { x: x + 1, y: y + height * 2 }, // off bottom
-    ])(
-      'Returns false for locations that are outside of the area',
-      (location: XY) => {
-        expect(
-          testArea.contains({
-            ...defaultLocation(),
-            x: location.x,
-            y: location.y,
-          })
-        ).toBe(false);
-      }
-    );
+    ])('Returns false for locations that are outside of the area', (location: XY) => {
+      expect(
+        testArea.contains({
+          ...defaultLocation(),
+          x: location.x,
+          y: location.y,
+        }),
+      ).toBe(false);
+    });
   });
   describe('overlaps', () => {
     /*
@@ -203,20 +180,17 @@ describe('InteractableArea', () => {
       { x: cx, y: cy, width: 2, height: 2 },
       { x: cx + 4, y: cy + 4, width: 2, height: 2 },
       { x: cx + 4, y: cy + 4, width: 2, height: 2 },
-    ])(
-      'Returns true for locations that are contained entirely %p',
-      (intersectBox: BoundingBox) => {
-        expect(
-          testArea.overlaps(
-            new ConversationArea(
-              { id: 'testArea', occupantsByID: [] },
-              intersectBox,
-              mock<TownEmitter>()
-            )
-          )
-        ).toBe(true);
-      }
-    );
+    ])('Returns true for locations that are contained entirely %p', (intersectBox: BoundingBox) => {
+      expect(
+        testArea.overlaps(
+          new ConversationArea(
+            { id: 'testArea', occupantsByID: [] },
+            intersectBox,
+            mock<TownEmitter>(),
+          ),
+        ),
+      ).toBe(true);
+    });
     it.each<BoundingBox>([
       { x: x - 50, y: y - 50, width: 100, height: 100 }, // TL
       { x: x - 50, y: y + height - 50, width: 100, height: 100 }, // BL
@@ -254,11 +228,11 @@ describe('InteractableArea', () => {
             new ConversationArea(
               { id: 'testArea', occupantsByID: [] },
               intersectBox,
-              mock<TownEmitter>()
-            )
-          )
+              mock<TownEmitter>(),
+            ),
+          ),
         ).toBe(true);
-      }
+      },
     );
     it.each<BoundingBox>([
       { x: x - 50, y: y - 50, width: 10, height: 10 }, // TL
@@ -289,19 +263,16 @@ describe('InteractableArea', () => {
         width: PLAYER_SPRITE_WIDTH,
         height: PLAYER_SPRITE_HEIGHT,
       }, // BR, plus offset
-    ])(
-      'Returns false for locations that have no overlap %p',
-      (intersectBox: BoundingBox) => {
-        expect(
-          testArea.overlaps(
-            new ConversationArea(
-              { id: 'testArea', occupantsByID: [] },
-              intersectBox,
-              mock<TownEmitter>()
-            )
-          )
-        ).toBe(false);
-      }
-    );
+    ])('Returns false for locations that have no overlap %p', (intersectBox: BoundingBox) => {
+      expect(
+        testArea.overlaps(
+          new ConversationArea(
+            { id: 'testArea', occupantsByID: [] },
+            intersectBox,
+            mock<TownEmitter>(),
+          ),
+        ),
+      ).toBe(false);
+    });
   });
 });

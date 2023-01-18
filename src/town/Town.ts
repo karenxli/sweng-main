@@ -90,10 +90,7 @@ export default class Town {
 
   private readonly _capacity: number;
 
-  private readonly _broadcastEmitter: BroadcastOperator<
-    ServerToClientEvents,
-    SocketData
-  >;
+  private readonly _broadcastEmitter: BroadcastOperator<ServerToClientEvents, SocketData>;
 
   private readonly _connectedSockets: Set<CoveyTownSocket> = new Set();
 
@@ -101,7 +98,7 @@ export default class Town {
     friendlyName: string,
     isPubliclyListed: boolean,
     townID: string,
-    broadcastEmitter: BroadcastOperator<ServerToClientEvents, SocketData>
+    broadcastEmitter: BroadcastOperator<ServerToClientEvents, SocketData>,
   ) {
     this._townID = townID;
     this._capacity = 50;
@@ -124,10 +121,7 @@ export default class Town {
     this._connectedSockets.add(socket);
 
     // Create a video token for this user to join this town
-    newPlayer.videoToken = await this._videoClient.getTokenForTown(
-      this._townID,
-      newPlayer.id
-    );
+    newPlayer.videoToken = await this._videoClient.getTokenForTown(this._townID, newPlayer.id);
 
     // Notify other players that this player has joined
     this._broadcastEmitter.emit('playerJoined', newPlayer.toPlayerModel());
@@ -161,18 +155,16 @@ export default class Town {
     // updated. Does not throw an error if the specified viewing area or poster session area does not exist.
     socket.on('interactableUpdate', (update: Interactable): Player | void => {
       const changedInteractable = this._interactables.find(
-        (interactable) => interactable.id === update.id
+        interactable => interactable.id === update.id,
       ) as PosterSessionArea & ViewingArea;
       if (!changedInteractable) {
         return undefined;
       }
-      changedInteractable.updateModel(
-        update as PosterSessionArea & ViewingArea
-      );
+      changedInteractable.updateModel(update as PosterSessionArea & ViewingArea);
 
       newPlayer.townEmitter.emit('interactableUpdate', update);
+      return newPlayer;
     });
-    return newPlayer;
   }
 
   /**
@@ -184,7 +176,7 @@ export default class Town {
     if (player.location.interactableID) {
       this._removePlayerFromInteractable(player);
     }
-    this._players = this._players.filter((p) => p.id !== player.id);
+    this._players = this._players.filter(p => p.id !== player.id);
     this._broadcastEmitter.emit('playerDisconnect', player.toPlayerModel());
   }
 
@@ -198,12 +190,9 @@ export default class Town {
    * @param player Player to update location for
    * @param location New location for this player
    */
-  private _updatePlayerLocation(
-    player: Player,
-    location: PlayerLocation
-  ): void {
+  private _updatePlayerLocation(player: Player, location: PlayerLocation): void {
     const prevInteractable = this._interactables.find(
-      (conv) => conv.id === player.location.interactableID
+      conv => conv.id === player.location.interactableID,
     );
 
     if (!prevInteractable?.contains(location)) {
@@ -212,7 +201,7 @@ export default class Town {
         prevInteractable.remove(player);
       }
       const newInteractable = this._interactables.find(
-        (eachArea) => eachArea.isActive && eachArea.contains(location)
+        eachArea => eachArea.isActive && eachArea.contains(location),
       );
       if (newInteractable != null) {
         newInteractable.add(player);
@@ -235,7 +224,7 @@ export default class Town {
    */
   private _removePlayerFromInteractable(player: Player): void {
     const area = this._interactables.find(
-      (eachArea) => eachArea.id === player.location.interactableID
+      eachArea => eachArea.id === player.location.interactableID,
     );
     if (area != null) {
       area.remove(player);
@@ -261,7 +250,7 @@ export default class Town {
    */
   public addConversationArea(conversationArea: ConversationAreaModel): boolean {
     const area = this._interactables.find(
-      (eachArea) => eachArea.id === conversationArea.id
+      eachArea => eachArea.id === conversationArea.id,
     ) as ConversationArea;
     if (!area || !conversationArea.topic || area.topic) {
       return false;
@@ -291,7 +280,7 @@ export default class Town {
    */
   public addViewingArea(viewingArea: ViewingAreaModel): boolean {
     const area = this._interactables.find(
-      (eachArea) => eachArea.id === viewingArea.id
+      eachArea => eachArea.id === viewingArea.id,
     ) as ViewingArea;
     if (!area || !viewingArea.video || area.video) {
       return false;
@@ -320,18 +309,11 @@ export default class Town {
    * poster session area with the specified ID or if there is already an active poster session area
    * with the specified ID or if there is no poster image and title specified
    */
-  public addPosterSessionArea(
-    posterSessionArea: PosterSessionAreaModel
-  ): boolean {
+  public addPosterSessionArea(posterSessionArea: PosterSessionAreaModel): boolean {
     const area = this._interactables.find(
-      (eachArea) => eachArea.id === posterSessionArea.id
+      eachArea => eachArea.id === posterSessionArea.id,
     ) as PosterSessionArea;
-    if (
-      !area ||
-      !posterSessionArea.title ||
-      !posterSessionArea.imageContents ||
-      area.title
-    ) {
+    if (!area || !posterSessionArea.title || !posterSessionArea.imageContents || area.title) {
       return false;
     }
     area.updateModel(posterSessionArea);
@@ -347,7 +329,7 @@ export default class Town {
    * @param token
    */
   public getPlayerBySessionToken(token: string): Player | undefined {
-    return this.players.find((eachPlayer) => eachPlayer.sessionToken === token);
+    return this.players.find(eachPlayer => eachPlayer.sessionToken === token);
   }
 
   /**
@@ -358,9 +340,7 @@ export default class Town {
    * @throws Error if no such interactable exists
    */
   public getInteractable(id: string): InteractableArea {
-    const ret = this._interactables.find(
-      (eachInteractable) => eachInteractable.id === id
-    );
+    const ret = this._interactables.find(eachInteractable => eachInteractable.id === id);
     if (ret == null) {
       throw new Error(`No such interactable ${id}`);
     }
@@ -373,7 +353,7 @@ export default class Town {
    */
   public disconnectAllPlayers(): void {
     this._broadcastEmitter.emit('townClosing');
-    this._connectedSockets.forEach((eachSocket) => eachSocket.disconnect(true));
+    this._connectedSockets.forEach(eachSocket => eachSocket.disconnect(true));
   }
 
   /**
@@ -394,27 +374,25 @@ export default class Town {
    */
   public initializeFromMap(map: ITiledMap) {
     const objectLayer = map.layers.find(
-      (eachLayer) => eachLayer.name === 'Objects'
+      eachLayer => eachLayer.name === 'Objects',
     ) as ITiledMapObjectLayer;
     if (!objectLayer) {
       throw new Error('Unable to find objects layer in map');
     }
     const viewingAreas = objectLayer.objects
-      .filter((eachObject) => eachObject.type === 'ViewingArea')
-      .map((eachViewingAreaObject) =>
-        ViewingArea.fromMapObject(eachViewingAreaObject, this._broadcastEmitter)
+      .filter(eachObject => eachObject.type === 'ViewingArea')
+      .map(eachViewingAreaObject =>
+        ViewingArea.fromMapObject(eachViewingAreaObject, this._broadcastEmitter),
       );
 
     const conversationAreas = objectLayer.objects
-      .filter((eachObject) => eachObject.type === 'ConversationArea')
-      .map((eachConvAreaObj) =>
-        ConversationArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter)
+      .filter(eachObject => eachObject.type === 'ConversationArea')
+      .map(eachConvAreaObj =>
+        ConversationArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter),
       );
     const posterSessionAreas = objectLayer.objects
-      .filter((eachObject) => eachObject.type === 'PosterSessionArea')
-      .map((eachPSAreaObj) =>
-        PosterSessionArea.fromMapObject(eachPSAreaObj, this._broadcastEmitter)
-      );
+      .filter(eachObject => eachObject.type === 'PosterSessionArea')
+      .map(eachPSAreaObj => PosterSessionArea.fromMapObject(eachPSAreaObj, this._broadcastEmitter));
 
     this._interactables = this._interactables
       .concat(viewingAreas)
@@ -426,28 +404,22 @@ export default class Town {
 
   private _validateInteractables() {
     // Make sure that the IDs are unique
-    const interactableIDs = this._interactables.map(
-      (eachInteractable) => eachInteractable.id
-    );
+    const interactableIDs = this._interactables.map(eachInteractable => eachInteractable.id);
     if (
       interactableIDs.some(
-        (item) =>
-          interactableIDs.indexOf(item) !== interactableIDs.lastIndexOf(item)
+        item => interactableIDs.indexOf(item) !== interactableIDs.lastIndexOf(item),
       )
     ) {
       throw new Error(
-        `Expected all interactable IDs to be unique, but found duplicate interactable ID in ${interactableIDs}`
+        `Expected all interactable IDs to be unique, but found duplicate interactable ID in ${interactableIDs}`,
       );
     }
     // Make sure that there are no overlapping objects
     for (const interactable of this._interactables) {
       for (const otherInteractable of this._interactables) {
-        if (
-          interactable !== otherInteractable &&
-          interactable.overlaps(otherInteractable)
-        ) {
+        if (interactable !== otherInteractable && interactable.overlaps(otherInteractable)) {
           throw new Error(
-            `Expected interactables not to overlap, but found overlap between ${interactable.id} and ${otherInteractable.id}`
+            `Expected interactables not to overlap, but found overlap between ${interactable.id} and ${otherInteractable.id}`,
           );
         }
       }
