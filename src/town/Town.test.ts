@@ -538,10 +538,16 @@ describe('Town', () => {
           expect(lastUpdate).toEqual(newArea);
         });
         it('Should not emit interactableUpdate events to players directly, or to the whole town', () => {
-          expect(() => getLastEmittedEvent(playerTestData.socket, 'interactableUpdate')).toThrowError();
+          expect(() => 
+          getLastEmittedEvent(playerTestData.socket, 'interactableUpdate'),
+          ).toThrowError();
           expect(() => getLastEmittedEvent(townEmitter, 'interactableUpdate')).toThrowError();
-          expect(() => getLastEmittedEvent(secondPlayer.socket, 'interactableUpdate')).toThrowError();
-          expect(() => getLastEmittedEvent(secondPlayer.socketToRoomMock, 'interactableUpdate')).toThrowError();
+          expect(() => 
+          getLastEmittedEvent(secondPlayer.socket, 'interactableUpdate'),
+          ).toThrowError();
+          expect(() => 
+          getLastEmittedEvent(secondPlayer.socketToRoomMock, 'interactableUpdate'),
+          ).toThrowError();
         });
       });
     });
@@ -709,11 +715,9 @@ describe('Town', () => {
       ).toEqual(false);
     });
     it('Should return false if the requested topic is empty', () => {
-      expect(
-        town.addConversationArea({ id: 'Name1', topic: '', occupantsByID: [] })
+      expect(town.addConversationArea({ id: 'Name1', topic: '', occupantsByID: [] })
       ).toEqual(false);
-      expect(
-        town.addConversationArea({ id: 'Name1', topic: '', occupantsByID: [] })
+      expect(town.addConversationArea({ id: 'Name1', topic: '', occupantsByID: [] })
       ).toEqual(false);
     });
     it('Should return false if the area already has a topic', () => {
@@ -736,7 +740,8 @@ describe('Town', () => {
       const newTopic = 'new topic';
       beforeEach(() => {
         playerTestData.moveTo(45, 122); // Inside of "Name1" area
-        expect(town.addConversationArea({id: 'Name1', topic: newTopic, occupantsByID: [],})
+        expect(
+          town.addConversationArea({id: 'Name1', topic: newTopic, occupantsByID: [],})
         ).toEqual(true);
       });
       it('Should update the local model for that area', () => {
@@ -748,7 +753,7 @@ describe('Town', () => {
         expect(convArea.occupantsByID).toEqual([player.id]);
       });
       it('Should emit an interactableUpdate message', () => {
-        const lastEmittedUpdate = getLastEmittedEvent( townEmitter, 'interactableUpdate' );
+        const lastEmittedUpdate = getLastEmittedEvent(townEmitter, 'interactableUpdate');
         expect(lastEmittedUpdate).toEqual({
           id: 'Name1',
           topic: newTopic,
@@ -825,7 +830,7 @@ describe('Town', () => {
       });
 
       it('Should emit an interactableUpdate message', () => {
-        const lastEmittedUpdate = getLastEmittedEvent( townEmitter, 'interactableUpdate' );
+        const lastEmittedUpdate = getLastEmittedEvent(townEmitter, 'interactableUpdate');
         expect(lastEmittedUpdate).toEqual(newModel);
       });
       it('Should include any players in that area as occupants', () => {
@@ -921,7 +926,7 @@ describe('Town', () => {
       });
 
       it('Should emit an interactableUpdate message', () => {
-        const lastEmittedUpdate = getLastEmittedEvent( townEmitter, 'interactableUpdate' );
+        const lastEmittedUpdate = getLastEmittedEvent(townEmitter, 'interactableUpdate');
         expect(lastEmittedUpdate).toEqual(newModel);
       });
       it('Should include any players in that area as occupants', () => {
@@ -1010,19 +1015,19 @@ describe('Town', () => {
       });
       it('Adds a player to a new interactable and sets their conversation label, if they move into it', async () => {
         const newPlayer = mockPlayer(town.townID);
-        const newPlayerObj = await town.addPlayer( newPlayer.userName, newPlayer.socket );
+        const newPlayerObj = await town.addPlayer(newPlayer.userName, newPlayer.socket);
         newPlayer.moveTo(51, 121);
 
         // Check that the player's location was updated
         expect(newPlayerObj.location.interactableID).toEqual('Name1');
 
         // Check that a movement event was emitted with the correct label
-        const lastEmittedMovement = getLastEmittedEvent( townEmitter, 'playerMoved' );
+        const lastEmittedMovement = getLastEmittedEvent(townEmitter, 'playerMoved');
         expect(lastEmittedMovement.location.interactableID).toEqual('Name1');
 
         // Check that the conversation area occupants was updated
         const occupants = town.getInteractable('Name1').occupantsByID;
-        expectArraysToContainSameMembers(occupants, [ newPlayerObj.id, player.id, ]);
+        expectArraysToContainSameMembers(occupants, [newPlayerObj.id, player.id]);
       });
       it('Removes a player from their prior interactable and sets their conversation label, if they moved outside of it', () => {
         expect(player.location.interactableID).toEqual('Name1');
