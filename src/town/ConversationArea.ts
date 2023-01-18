@@ -1,11 +1,11 @@
-import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
-import Player from '../lib/Player';
+import { ITiledMapObject } from "@jonbell/tiled-map-type-guard";
+import Player from "../lib/Player";
 import {
   BoundingBox,
   ConversationArea as ConversationAreaModel,
   TownEmitter,
-} from '../types/CoveyTownSocket';
-import InteractableArea from './InteractableArea';
+} from "../types/CoveyTownSocket";
+import InteractableArea from "./InteractableArea";
 
 export default class ConversationArea extends InteractableArea {
   /* The topic of the conversation area, or undefined if it is not set */
@@ -26,7 +26,7 @@ export default class ConversationArea extends InteractableArea {
   public constructor(
     { topic, id }: ConversationAreaModel,
     coordinates: BoundingBox,
-    townEmitter: TownEmitter,
+    townEmitter: TownEmitter
   ) {
     super(id, coordinates, townEmitter);
     this.topic = topic;
@@ -68,13 +68,17 @@ export default class ConversationArea extends InteractableArea {
    */
   public static fromMapObject(
     mapObject: ITiledMapObject,
-    broadcastEmitter: TownEmitter,
+    broadcastEmitter: TownEmitter
   ): ConversationArea {
     const { name, width, height } = mapObject;
     if (!width || !height) {
       throw new Error(`Malformed viewing area ${name}`);
     }
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
-    return new ConversationArea({ id: name, occupantsByID: [] }, rect, broadcastEmitter);
+    return new ConversationArea(
+      { id: name, occupantsByID: [] },
+      rect,
+      broadcastEmitter
+    );
   }
 }

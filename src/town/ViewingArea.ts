@@ -1,11 +1,11 @@
-import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
-import Player from '../lib/Player';
+import { ITiledMapObject } from "@jonbell/tiled-map-type-guard";
+import Player from "../lib/Player";
 import {
   BoundingBox,
   TownEmitter,
   ViewingArea as ViewingAreaModel,
-} from '../types/CoveyTownSocket';
-import InteractableArea from './InteractableArea';
+} from "../types/CoveyTownSocket";
+import InteractableArea from "./InteractableArea";
 
 export default class ViewingArea extends InteractableArea {
   private _video?: string;
@@ -36,7 +36,7 @@ export default class ViewingArea extends InteractableArea {
   public constructor(
     { id, isPlaying, elapsedTimeSec: progress, video }: ViewingAreaModel,
     coordinates: BoundingBox,
-    townEmitter: TownEmitter,
+    townEmitter: TownEmitter
   ) {
     super(id, coordinates, townEmitter);
     this._video = video;
@@ -65,7 +65,11 @@ export default class ViewingArea extends InteractableArea {
    *
    * @param viewingArea updated model
    */
-  public updateModel({ isPlaying, elapsedTimeSec: progress, video }: ViewingAreaModel) {
+  public updateModel({
+    isPlaying,
+    elapsedTimeSec: progress,
+    video,
+  }: ViewingAreaModel) {
     this._video = video;
     this._isPlaying = isPlaying;
     this._elapsedTimeSec = progress;
@@ -90,12 +94,19 @@ export default class ViewingArea extends InteractableArea {
    * @param townEmitter An emitter that can be used by this viewing area to broadcast updates to players in the town
    * @returns
    */
-  public static fromMapObject(mapObject: ITiledMapObject, townEmitter: TownEmitter): ViewingArea {
+  public static fromMapObject(
+    mapObject: ITiledMapObject,
+    townEmitter: TownEmitter
+  ): ViewingArea {
     const { name, width, height } = mapObject;
     if (!width || !height) {
       throw new Error(`Malformed viewing area ${name}`);
     }
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
-    return new ViewingArea({ isPlaying: false, id: name, elapsedTimeSec: 0 }, rect, townEmitter);
+    return new ViewingArea(
+      { isPlaying: false, id: name, elapsedTimeSec: 0 },
+      rect,
+      townEmitter
+    );
   }
 }

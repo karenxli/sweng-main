@@ -1,23 +1,23 @@
-import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
-import Player from '../lib/Player';
+import { ITiledMapObject } from "@jonbell/tiled-map-type-guard";
+import e from "express";
+import Player from "../lib/Player";
 import {
   BoundingBox,
   TownEmitter,
   PosterSessionArea as PosterSessionAreaModel,
-} from '../types/CoveyTownSocket';
-import InteractableArea from './InteractableArea';
-import e from 'express';
+} from "../types/CoveyTownSocket";
+import InteractableArea from "./InteractableArea";
 
 export default class PosterSessionArea extends InteractableArea {
-
   // add fields
   private _poster?: string;
+
   private _stars: number;
+
   private _title?: string;
 
-  private _coordinates: BoundingBox;
+  private readonly _coordinates: BoundingBox;
   /* An emitter that can be used to broadcast messages to all players in this town */
-
 
   public get stars() {
     return this._stars;
@@ -45,17 +45,15 @@ export default class PosterSessionArea extends InteractableArea {
   public constructor(
     { id, stars, imageContents, title }: PosterSessionAreaModel,
     coordinates: BoundingBox,
-    townEmitter: TownEmitter,
-
+    townEmitter: TownEmitter
   ) {
     super(id, coordinates, townEmitter);
     // extends Interactable Area
     // fill in
     this._poster = imageContents;
-    if(stars < 0) {
+    if (stars < 0) {
       throw new Error("Invalid number of stars!");
-    }
-    else this._stars = stars;
+    } else this._stars = stars;
     this._title = title;
     this._coordinates = coordinates;
   }
@@ -83,6 +81,7 @@ export default class PosterSessionArea extends InteractableArea {
   public incrementStars(): void {
     this._stars += 1;
   }
+
   /**
    * Updates the state of this PosterSessionArea, setting the poster, title, and stars properties
    *
@@ -103,7 +102,7 @@ export default class PosterSessionArea extends InteractableArea {
       id: this.id,
       stars: this._stars,
       imageContents: this._poster,
-      title: this._title
+      title: this._title,
     };
   }
 
@@ -115,13 +114,13 @@ export default class PosterSessionArea extends InteractableArea {
    */
   public static fromMapObject(
     mapObject: ITiledMapObject,
-    townEmitter: TownEmitter,
+    townEmitter: TownEmitter
   ): PosterSessionArea {
-  const { name, width, height } = mapObject;
+    const { name, width, height } = mapObject;
     if (!width || !height) {
       throw new Error(`Malformed viewing area ${name}`);
     }
     const rect: BoundingBox = { x: mapObject.x, y: mapObject.y, width, height };
-    return new PosterSessionArea({id: name, stars: 0}, rect, townEmitter);
+    return new PosterSessionArea({ id: name, stars: 0 }, rect, townEmitter);
   }
 }

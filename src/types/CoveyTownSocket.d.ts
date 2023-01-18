@@ -1,7 +1,7 @@
-import { BroadcastOperator, Socket } from 'socket.io';
-import InteractableArea from '../town/InteractableArea';
+import { BroadcastOperator, Socket } from "socket.io";
+// import InteractableArea from "../town/InteractableArea";
 
-export type TownJoinResponse = {
+export interface TownJoinResponse {
   /** Unique ID that represents this player * */
   userID: string;
   /** Secret token that this player should use to authenticate
@@ -18,23 +18,26 @@ export type TownJoinResponse = {
   isPubliclyListed: boolean;
   /** Current state of interactables in this town */
   interactables: Interactable[];
-};
+}
 
 export type Interactable = ViewingArea | ConversationArea | PosterSessionArea;
 
-export type TownSettingsUpdate = {
+export interface TownSettingsUpdate {
   friendlyName?: string;
   isPubliclyListed?: boolean;
-};
+}
 
-export type Direction = 'front' | 'back' | 'left' | 'right';
+export type Direction = "front" | "back" | "left" | "right";
 export interface Player {
   id: string;
   userName: string;
   location: PlayerLocation;
 }
 
-export type XY = { x: number; y: number };
+export interface XY {
+  x: number;
+  y: number;
+}
 
 export interface PlayerLocation {
   /* The CENTER x coordinate of this player's location */
@@ -46,13 +49,13 @@ export interface PlayerLocation {
   moving: boolean;
   interactableID?: string;
 }
-export type ChatMessage = {
+export interface ChatMessage {
   author: string;
   sid: string;
   body: string;
   dateCreated: Date;
   interactableId?: string;
-};
+}
 
 export interface ConversationArea {
   id: string;
@@ -98,6 +101,9 @@ export interface ClientToServerEvents {
 }
 
 export type SocketData = Record<string, never>;
-export type CoveyTownSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
+export type CoveyTownSocket = Socket<
+  ClientToServerEvents,
+  ServerToClientEvents
+>;
 export type TownEmitter = BroadcastOperator<ServerToClientEvents, SocketData>;
 export type TownEmitterFactory = (townID: string) => TownEmitter;

@@ -6,7 +6,7 @@
  */
 // eslint-disable-next-line
 export function removeThisFunctionCallWhenYouImplementThis(_args1?: any, _args2?: any): Error {
-  return new Error('Unimplemented');
+  return new Error("Unimplemented");
 }
 
 // eslint-disable-next-line

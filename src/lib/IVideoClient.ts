@@ -11,5 +11,8 @@ export default interface IVideoClient {
    * @param clientIdentity The identity of the client; the video service will map a client
    *                      that connects with the returned token back to this client identifier
    */
-  getTokenForTown(coveyTownID: string, clientIdentity: string): Promise<string>;
+  getTokenForTown: (
+    coveyTownID: string,
+    clientIdentity: string
+  ) => Promise<string>;
 }

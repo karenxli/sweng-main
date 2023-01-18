@@ -1,5 +1,10 @@
-import Player from '../lib/Player';
-import { BoundingBox, Interactable, PlayerLocation, TownEmitter } from '../types/CoveyTownSocket';
+import Player from "../lib/Player";
+import {
+  BoundingBox,
+  Interactable,
+  PlayerLocation,
+  TownEmitter,
+} from "../types/CoveyTownSocket";
 
 export const PLAYER_SPRITE_WIDTH = 32;
 export const PLAYER_SPRITE_HEIGHT = 64;
@@ -9,29 +14,29 @@ export default abstract class InteractableArea {
   private readonly _id: string;
 
   /* The x coordinate of the top left of this area */
-  private _x: number;
+  private readonly _x: number;
 
   /* The y coordinate of the top left of this area */
-  private _y: number;
+  private readonly _y: number;
 
   /* The height of this area */
-  private _width: number;
+  private readonly _width: number;
 
   /* The height of this area */
-  private _height: number;
+  private readonly _height: number;
 
   /* The current set of players in this area. Maintained by the InteractableArea class. */
   protected _occupants: Player[] = [];
 
   /* An emitter that can be used to broadcast messages to all players in this town */
-  private _townEmitter: TownEmitter;
+  private readonly _townEmitter: TownEmitter;
 
   public get id() {
     return this._id;
   }
 
   public get occupantsByID(): string[] {
-    return this._occupants.map(eachPlayer => eachPlayer.id);
+    return this._occupants.map((eachPlayer) => eachPlayer.id);
   }
 
   public get isActive(): boolean {
@@ -48,7 +53,11 @@ export default abstract class InteractableArea {
    * @param boundingBox The rectangular coordinates that define this InteractableArea, where (x,y) specify the top-left corner
    * @param townEmitter An emitter that can be used to broadcast events to players in this town
    */
-  public constructor(id: string, { x, y, width, height }: BoundingBox, townEmitter: TownEmitter) {
+  public constructor(
+    id: string,
+    { x, y, width, height }: BoundingBox,
+    townEmitter: TownEmitter
+  ) {
     this._id = id;
     this._x = x;
     this._y = y;
@@ -70,7 +79,7 @@ export default abstract class InteractableArea {
   public add(player: Player): void {
     this._occupants.push(player);
     player.location.interactableID = this.id;
-    this._townEmitter.emit('playerMoved', player.toPlayerModel());
+    this._townEmitter.emit("playerMoved", player.toPlayerModel());
     this._emitAreaChanged();
   }
 
@@ -85,9 +94,11 @@ export default abstract class InteractableArea {
    * @param player Player to remove
    */
   public remove(player: Player): void {
-    this._occupants = this._occupants.filter(eachPlayer => eachPlayer !== player);
+    this._occupants = this._occupants.filter(
+      (eachPlayer) => eachPlayer !== player
+    );
     player.location.interactableID = undefined;
-    this._townEmitter.emit('playerMoved', player.toPlayerModel());
+    this._townEmitter.emit("playerMoved", player.toPlayerModel());
     this._emitAreaChanged();
   }
 
@@ -98,8 +109,10 @@ export default abstract class InteractableArea {
    */
   public addPlayersWithinBounds(allPlayers: Player[]) {
     allPlayers
-      .filter(eachPlayer => this.contains(eachPlayer.location))
-      .forEach(eachContainedPlayer => this.add(eachContainedPlayer));
+      .filter((eachPlayer) => this.contains(eachPlayer.location))
+      .forEach((eachContainedPlayer) => {
+        this.add(eachContainedPlayer);
+      });
   }
 
   /**
@@ -142,7 +155,10 @@ export default abstract class InteractableArea {
     const rect1 = toRectPoints(this);
     const rect2 = toRectPoints(otherInteractable);
     const noOverlap =
-      rect1.x1 >= rect2.x2 || rect2.x1 >= rect1.x2 || rect1.y1 >= rect2.y2 || rect2.y1 >= rect1.y2;
+      rect1.x1 >= rect2.x2 ||
+      rect2.x1 >= rect1.x2 ||
+      rect1.y1 >= rect2.y2 ||
+      rect2.y1 >= rect1.y2;
     return !noOverlap;
   }
 
@@ -151,7 +167,7 @@ export default abstract class InteractableArea {
    * the model for this InteractableArea in that event.
    */
   protected _emitAreaChanged() {
-    this._townEmitter.emit('interactableUpdate', this.toModel());
+    this._townEmitter.emit("interactableUpdate", this.toModel());
   }
 
   /**

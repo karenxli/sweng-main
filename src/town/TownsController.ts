@@ -1,4 +1,4 @@
-import assert from 'assert';
+import assert from "assert";
 import {
   Body,
   Controller,
@@ -12,26 +12,26 @@ import {
   Response,
   Route,
   Tags,
-} from 'tsoa';
+} from "tsoa";
 
-import { Town, TownCreateParams, TownCreateResponse } from '../api/Model';
-import InvalidParametersError from '../lib/InvalidParametersError';
-import CoveyTownsStore from '../lib/TownsStore';
+import { Town, TownCreateParams, TownCreateResponse } from "../api/Model";
+import InvalidParametersError from "../lib/InvalidParametersError";
+import CoveyTownsStore from "../lib/TownsStore";
 import {
   ConversationArea,
   CoveyTownSocket,
   TownSettingsUpdate,
   ViewingArea,
   PosterSessionArea as PosterSessionAreaModel,
-} from '../types/CoveyTownSocket';
-import PosterSessionArea from './PosterSessionArea';
-import { isPosterSessionArea } from '../TestUtils';
+} from "../types/CoveyTownSocket";
+import PosterSessionArea from "./PosterSessionArea";
+import { isPosterSessionArea } from "../TestUtils";
 
 /**
  * This is the town route
  */
-@Route('towns')
-@Tags('towns')
+@Route("towns")
+@Tags("towns")
 // TSOA (which we use to generate the REST API from this file) does not support default exports, so the controller can't be a default export.
 // eslint-disable-next-line import/prefer-default-export
 export class TownsController extends Controller {
@@ -54,13 +54,18 @@ export class TownsController extends Controller {
    * @example request {"friendlyName": "My testing town public name", "isPubliclyListed": true}
    * @returns The ID of the newly created town, and a secret password that will be needed to update or delete this town.
    */
-  @Example<TownCreateResponse>({ townID: 'stringID', townUpdatePassword: 'secretPassword' })
+  @Example<TownCreateResponse>({
+    townID: "stringID",
+    townUpdatePassword: "secretPassword",
+  })
   @Post()
-  public async createTown(@Body() request: TownCreateParams): Promise<TownCreateResponse> {
+  public async createTown(
+    @Body() request: TownCreateParams
+  ): Promise<TownCreateResponse> {
     const { townID, townUpdatePassword } = await this._townsStore.createTown(
       request.friendlyName,
       request.isPubliclyListed,
-      request.mapFile,
+      request.mapFile
     );
     return {
       townID,
@@ -75,21 +80,26 @@ export class TownsController extends Controller {
    * @param townUpdatePassword  town update password, must match the password returned by createTown
    * @param requestBody The updated settings
    */
-  @Patch('{townID}')
-  @Response<InvalidParametersError>(400, 'Invalid password or update values specified')
+  @Patch("{townID}")
+  @Response<InvalidParametersError>(
+    400,
+    "Invalid password or update values specified"
+  )
   public async updateTown(
     @Path() townID: string,
-    @Header('X-CoveyTown-Password') townUpdatePassword: string,
-    @Body() requestBody: TownSettingsUpdate,
+    @Header("X-CoveyTown-Password") townUpdatePassword: string,
+    @Body() requestBody: TownSettingsUpdate
   ): Promise<void> {
     const success = this._townsStore.updateTown(
       townID,
       townUpdatePassword,
       requestBody.friendlyName,
-      requestBody.isPubliclyListed,
+      requestBody.isPubliclyListed
     );
     if (!success) {
-      throw new InvalidParametersError('Invalid password or update values specified');
+      throw new InvalidParametersError(
+        "Invalid password or update values specified"
+      );
     }
   }
 
@@ -98,15 +108,20 @@ export class TownsController extends Controller {
    * @param townID ID of the town to delete
    * @param townUpdatePassword town update password, must match the password returned by createTown
    */
-  @Delete('{townID}')
-  @Response<InvalidParametersError>(400, 'Invalid password or update values specified')
+  @Delete("{townID}")
+  @Response<InvalidParametersError>(
+    400,
+    "Invalid password or update values specified"
+  )
   public async deleteTown(
     @Path() townID: string,
-    @Header('X-CoveyTown-Password') townUpdatePassword: string,
+    @Header("X-CoveyTown-Password") townUpdatePassword: string
   ): Promise<void> {
     const success = this._townsStore.deleteTown(townID, townUpdatePassword);
     if (!success) {
-      throw new InvalidParametersError('Invalid password or update values specified');
+      throw new InvalidParametersError(
+        "Invalid password or update values specified"
+      );
     }
   }
 
@@ -116,20 +131,20 @@ export class TownsController extends Controller {
    * @param sessionToken session token of the player making the request, must match the session token returned when the player joined the town
    * @param requestBody The new conversation area to create
    */
-  @Post('{townID}/conversationArea')
-  @Response<InvalidParametersError>(400, 'Invalid values specified')
+  @Post("{townID}/conversationArea")
+  @Response<InvalidParametersError>(400, "Invalid values specified")
   public async createConversationArea(
     @Path() townID: string,
-    @Header('X-Session-Token') sessionToken: string,
-    @Body() requestBody: ConversationArea,
+    @Header("X-Session-Token") sessionToken: string,
+    @Body() requestBody: ConversationArea
   ): Promise<void> {
     const town = this._townsStore.getTownByID(townID);
     if (!town?.getPlayerBySessionToken(sessionToken)) {
-      throw new InvalidParametersError('Invalid values specified');
+      throw new InvalidParametersError("Invalid values specified");
     }
     const success = town.addConversationArea(requestBody);
     if (!success) {
-      throw new InvalidParametersError('Invalid values specified');
+      throw new InvalidParametersError("Invalid values specified");
     }
   }
 
@@ -144,26 +159,27 @@ export class TownsController extends Controller {
    * @throws InvalidParametersError if the session token is not valid, or if the
    *          viewing area could not be created
    */
-  @Post('{townID}/viewingArea')
-  @Response<InvalidParametersError>(400, 'Invalid values specified')
+  @Post("{townID}/viewingArea")
+  @Response<InvalidParametersError>(400, "Invalid values specified")
   public async createViewingArea(
     @Path() townID: string,
-    @Header('X-Session-Token') sessionToken: string,
-    @Body() requestBody: ViewingArea,
+    @Header("X-Session-Token") sessionToken: string,
+    @Body() requestBody: ViewingArea
   ): Promise<void> {
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
-      throw new InvalidParametersError('Invalid values specified');
+      throw new InvalidParametersError("Invalid values specified");
     }
     if (!town?.getPlayerBySessionToken(sessionToken)) {
-      throw new InvalidParametersError('Invalid values specified');
+      throw new InvalidParametersError("Invalid values specified");
     }
     const success = town.addViewingArea(requestBody);
     if (!success) {
-      throw new InvalidParametersError('Invalid values specified');
+      throw new InvalidParametersError("Invalid values specified");
     }
   }
-  // FILL IN - finished, not tested
+
+  // FILL IN - finished, tested
   /**
    * Creates a poster session area in a given town
    *
@@ -175,23 +191,23 @@ export class TownsController extends Controller {
    * @throws InvalidParametersError if the session token is not valid, or if the
    *          poster session area could not be created
    */
-  @Post('{townID}/posterSessionArea')
-  @Response<InvalidParametersError>(400, 'Invalid values specified')
+  @Post("{townID}/posterSessionArea")
+  @Response<InvalidParametersError>(400, "Invalid values specified")
   public async createPosterSessionArea(
     @Path() townID: string,
-    @Header('X-Session-Token') sessionToken: string,
-    @Body() requestBody: PosterSessionAreaModel,
+    @Header("X-Session-Token") sessionToken: string,
+    @Body() requestBody: PosterSessionAreaModel
   ): Promise<void> {
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
-      throw new InvalidParametersError('Invalid values specified');
+      throw new InvalidParametersError("Invalid values specified");
     }
     if (!town?.getPlayerBySessionToken(sessionToken)) {
-      throw new InvalidParametersError('Invalid values specified');
+      throw new InvalidParametersError("Invalid values specified");
     }
     const success = town.addPosterSessionArea(requestBody);
     if (!success) {
-      throw new InvalidParametersError('Invalid values specified');
+      throw new InvalidParametersError("Invalid values specified");
     }
   }
 
@@ -207,25 +223,24 @@ export class TownsController extends Controller {
    * @throws InvalidParametersError if the session token is not valid, or if the
    *          poster session specified does not exist
    */
-  @Patch('{townID}/{posterSessionId}')
-  @Response<InvalidParametersError>(400, 'Invalid values specified')
+  @Patch("{townID}/{posterSessionId}")
+  @Response<InvalidParametersError>(400, "Invalid values specified")
   public async getPosterAreaImageContents(
     @Path() townID: string,
     @Path() posterSessionId: string,
-    @Header('X-Session-Token') sessionToken: string,
+    @Header("X-Session-Token") sessionToken: string
   ): Promise<string | undefined> {
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
-      throw new InvalidParametersError('Invalid values specified');
+      throw new InvalidParametersError("Invalid values specified");
     }
     if (!town?.getPlayerBySessionToken(sessionToken)) {
-      throw new InvalidParametersError('Invalid values specified');
+      throw new InvalidParametersError("Invalid values specified");
     }
     const foundPoster = town.getInteractable(posterSessionId);
-    if(!foundPoster || !(isPosterSessionArea(foundPoster))) {
-      throw new InvalidParametersError('Invalid values specified');
-    }
-    else return foundPoster.imageContents
+    if (!foundPoster || !isPosterSessionArea(foundPoster)) {
+      throw new InvalidParametersError("Invalid values specified");
+    } else return foundPoster.imageContents;
   }
 
   // FILL IN - finished, not tested
@@ -242,26 +257,31 @@ export class TownsController extends Controller {
    *          poster session specified does not exist, or if the poster session specified
    *          does not have an image
    */
-  @Patch('{townID}/{posterSessionId}')
-  @Response<InvalidParametersError>(400, 'Invalid values specified')
+  @Patch("{townID}/{posterSessionId}")
+  @Response<InvalidParametersError>(400, "Invalid values specified")
   public async incrementPosterAreaStars(
     @Path() townID: string,
     @Path() posterSessionId: string,
-    @Header('X-Session-Token') sessionToken: string,
+    @Header("X-Session-Token") sessionToken: string
   ): Promise<number> {
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
-      throw new InvalidParametersError('Invalid values specified');
+      throw new InvalidParametersError("Invalid values specified");
     }
     if (!town?.getPlayerBySessionToken(sessionToken)) {
-      throw new InvalidParametersError('Invalid values specified');
+      throw new InvalidParametersError("Invalid values specified");
     }
-    const posterContents = this.getPosterAreaImageContents(townID, posterSessionId, sessionToken);
-    if(!posterContents) {
-      throw new InvalidParametersError('Invalid values specified');
-    }
-    else {
-      const foundPoster = town.getInteractable(posterSessionId) as unknown as PosterSessionArea;
+    const posterContents = this.getPosterAreaImageContents(
+      townID,
+      posterSessionId,
+      sessionToken
+    );
+    if (!posterContents) {
+      throw new InvalidParametersError("Invalid values specified");
+    } else {
+      const foundPoster = town.getInteractable(
+        posterSessionId
+      ) as unknown as PosterSessionArea;
       foundPoster.incrementStars();
       return foundPoster.stars;
     }
@@ -276,7 +296,10 @@ export class TownsController extends Controller {
    */
   public async joinTown(socket: CoveyTownSocket) {
     // Parse the client's requested username from the connection
-    const { userName, townID } = socket.handshake.auth as { userName: string; townID: string };
+    const { userName, townID } = socket.handshake.auth as {
+      userName: string;
+      townID: string;
+    };
 
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
@@ -289,14 +312,18 @@ export class TownsController extends Controller {
 
     const newPlayer = await town.addPlayer(userName, socket);
     assert(newPlayer.videoToken);
-    socket.emit('initialize', {
+    socket.emit("initialize", {
       userID: newPlayer.id,
       sessionToken: newPlayer.sessionToken,
       providerVideoToken: newPlayer.videoToken,
-      currentPlayers: town.players.map(eachPlayer => eachPlayer.toPlayerModel()),
+      currentPlayers: town.players.map((eachPlayer) =>
+        eachPlayer.toPlayerModel()
+      ),
       friendlyName: town.friendlyName,
       isPubliclyListed: town.isPubliclyListed,
-      interactables: town.interactables.map(eachInteractable => eachInteractable.toModel()),
+      interactables: town.interactables.map((eachInteractable) =>
+        eachInteractable.toModel()
+      ),
     });
   }
 }

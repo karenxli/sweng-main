@@ -1,4 +1,4 @@
-import Town from '../town/Town';
+import Town from "../town/Town";
 
 /**
  * An abstraction for a class that will track all of the towns
@@ -10,5 +10,5 @@ export default interface ITownsStore {
    *
    * @param townID the ID of the requested town
    */
-  getTownByID(townID: string): Town;
+  getTownByID: (townID: string) => Town;
 }

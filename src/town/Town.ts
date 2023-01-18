@@ -1,10 +1,9 @@
-import { ITiledMap, ITiledMapObjectLayer } from '@jonbell/tiled-map-type-guard';
-import { nanoid } from 'nanoid';
-import { BroadcastOperator } from 'socket.io';
-import IVideoClient from '../lib/IVideoClient';
-import Player from '../lib/Player';
-import TwilioVideo from '../lib/TwilioVideo';
-import { isPosterSessionArea, isViewingArea } from '../TestUtils';
+import { ITiledMap, ITiledMapObjectLayer } from "@jonbell/tiled-map-type-guard";
+import { nanoid } from "nanoid";
+import { BroadcastOperator } from "socket.io";
+import IVideoClient from "../lib/IVideoClient";
+import Player from "../lib/Player";
+import TwilioVideo from "../lib/TwilioVideo";
 import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
@@ -15,11 +14,11 @@ import {
   SocketData,
   ViewingArea as ViewingAreaModel,
   PosterSessionArea as PosterSessionAreaModel,
-} from '../types/CoveyTownSocket';
-import ConversationArea from './ConversationArea';
-import InteractableArea from './InteractableArea';
-import ViewingArea from './ViewingArea';
-import PosterSessionArea from './PosterSessionArea';
+} from "../types/CoveyTownSocket";
+import ConversationArea from "./ConversationArea";
+import InteractableArea from "./InteractableArea";
+import ViewingArea from "./ViewingArea";
+import PosterSessionArea from "./PosterSessionArea";
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -32,7 +31,9 @@ export default class Town {
 
   set isPubliclyListed(value: boolean) {
     this._isPubliclyListed = value;
-    this._broadcastEmitter.emit('townSettingsUpdated', { isPubliclyListed: value });
+    this._broadcastEmitter.emit("townSettingsUpdated", {
+      isPubliclyListed: value,
+    });
   }
 
   get isPubliclyListed(): boolean {
@@ -57,7 +58,7 @@ export default class Town {
 
   set friendlyName(value: string) {
     this._friendlyName = value;
-    this._broadcastEmitter.emit('townSettingsUpdated', { friendlyName: value });
+    this._broadcastEmitter.emit("townSettingsUpdated", { friendlyName: value });
   }
 
   get townID(): string {
@@ -68,14 +69,14 @@ export default class Town {
     return this._interactables;
   }
 
-  //get posterSession(): PosterSessionArea[] {
+  // get posterSession(): PosterSessionArea[] {
   //  return this.interactables.filter(typeof InteractableArea === PosterSessionArea );
- // }
+  // }
   /** The list of players currently in the town * */
   private _players: Player[] = [];
 
   /** The videoClient that this CoveyTown will use to provision video resources * */
-  private _videoClient: IVideoClient = TwilioVideo.getInstance();
+  private readonly _videoClient: IVideoClient = TwilioVideo.getInstance();
 
   private _interactables: InteractableArea[] = [];
 
@@ -87,17 +88,20 @@ export default class Town {
 
   private _isPubliclyListed: boolean;
 
-  private _capacity: number;
+  private readonly _capacity: number;
 
-  private _broadcastEmitter: BroadcastOperator<ServerToClientEvents, SocketData>;
+  private readonly _broadcastEmitter: BroadcastOperator<
+    ServerToClientEvents,
+    SocketData
+  >;
 
-  private _connectedSockets: Set<CoveyTownSocket> = new Set();
+  private readonly _connectedSockets: Set<CoveyTownSocket> = new Set();
 
   constructor(
     friendlyName: string,
     isPubliclyListed: boolean,
     townID: string,
-    broadcastEmitter: BroadcastOperator<ServerToClientEvents, SocketData>,
+    broadcastEmitter: BroadcastOperator<ServerToClientEvents, SocketData>
   ) {
     this._townID = townID;
     this._capacity = 50;
@@ -120,15 +124,18 @@ export default class Town {
     this._connectedSockets.add(socket);
 
     // Create a video token for this user to join this town
-    newPlayer.videoToken = await this._videoClient.getTokenForTown(this._townID, newPlayer.id);
+    newPlayer.videoToken = await this._videoClient.getTokenForTown(
+      this._townID,
+      newPlayer.id
+    );
 
     // Notify other players that this player has joined
-    this._broadcastEmitter.emit('playerJoined', newPlayer.toPlayerModel());
+    this._broadcastEmitter.emit("playerJoined", newPlayer.toPlayerModel());
 
     // Register an event listener for the client socket: if the client disconnects,
     // clean up our listener adapter, and then let the CoveyTownController know that the
     // player's session is disconnected
-    socket.on('disconnect', () => {
+    socket.on("disconnect", () => {
       this._removePlayer(newPlayer);
       this._connectedSockets.delete(socket);
     });
@@ -136,16 +143,11 @@ export default class Town {
     // PART 1
     // Set up a listener to forward all chat messages to all clients in the same interactableArea as the player,
     // and only if the message has the same interactable id as the player
-    socket.on('chatMessage', (message: ChatMessage) => {
-      if(message.interactableId === newPlayer.id) {
-
-      }
-
-    });
+    socket.on("chatMessage", (message: ChatMessage) => {});
 
     // Register an event listener for the client socket: if the client updates their
     // location, inform the CoveyTownController
-    socket.on('playerMovement', (movementData: PlayerLocation) => {
+    socket.on("playerMovement", (movementData: PlayerLocation) => {
       this._updatePlayerLocation(newPlayer, movementData);
     });
 
@@ -157,15 +159,18 @@ export default class Town {
     // the interactableUpdate to the other players in the town. Also dispatches an
     // updateModel call to the viewingArea or posterSessionArea that corresponds to the interactable being
     // updated. Does not throw an error if the specified viewing area or poster session area does not exist.
-    socket.on('interactableUpdate', (update: Interactable) : void | Player => {
-      const changedInteractable = this._interactables.find(interactable => interactable.id === update.id) as PosterSessionArea & ViewingArea;
-      if(!changedInteractable) {
-        return undefined
+    socket.on("interactableUpdate", (update: Interactable): Player | void => {
+      const changedInteractable = this._interactables.find(
+        (interactable) => interactable.id === update.id
+      ) as PosterSessionArea & ViewingArea;
+      if (!changedInteractable) {
+        return undefined;
       }
-      else {
-        changedInteractable.updateModel(update as PosterSessionArea & ViewingArea);
-      }
-      newPlayer.townEmitter.emit('interactableUpdate', update);
+      changedInteractable.updateModel(
+        update as PosterSessionArea & ViewingArea
+      );
+
+      newPlayer.townEmitter.emit("interactableUpdate", update);
     });
     return newPlayer;
   }
@@ -179,8 +184,8 @@ export default class Town {
     if (player.location.interactableID) {
       this._removePlayerFromInteractable(player);
     }
-    this._players = this._players.filter(p => p.id !== player.id);
-    this._broadcastEmitter.emit('playerDisconnect', player.toPlayerModel());
+    this._players = this._players.filter((p) => p.id !== player.id);
+    this._broadcastEmitter.emit("playerDisconnect", player.toPlayerModel());
   }
 
   /**
@@ -193,20 +198,23 @@ export default class Town {
    * @param player Player to update location for
    * @param location New location for this player
    */
-  private _updatePlayerLocation(player: Player, location: PlayerLocation): void {
+  private _updatePlayerLocation(
+    player: Player,
+    location: PlayerLocation
+  ): void {
     const prevInteractable = this._interactables.find(
-      conv => conv.id === player.location.interactableID,
+      (conv) => conv.id === player.location.interactableID
     );
 
     if (!prevInteractable?.contains(location)) {
-      if (prevInteractable) {
+      if (prevInteractable != null) {
         // Remove from old area
         prevInteractable.remove(player);
       }
       const newInteractable = this._interactables.find(
-        eachArea => eachArea.isActive && eachArea.contains(location),
+        (eachArea) => eachArea.isActive && eachArea.contains(location)
       );
-      if (newInteractable) {
+      if (newInteractable != null) {
         newInteractable.add(player);
       }
       location.interactableID = newInteractable?.id;
@@ -216,7 +224,7 @@ export default class Town {
 
     player.location = location;
 
-    this._broadcastEmitter.emit('playerMoved', player.toPlayerModel());
+    this._broadcastEmitter.emit("playerMoved", player.toPlayerModel());
   }
 
   /**
@@ -227,9 +235,9 @@ export default class Town {
    */
   private _removePlayerFromInteractable(player: Player): void {
     const area = this._interactables.find(
-      eachArea => eachArea.id === player.location.interactableID,
+      (eachArea) => eachArea.id === player.location.interactableID
     );
-    if (area) {
+    if (area != null) {
       area.remove(player);
     }
   }
@@ -253,14 +261,14 @@ export default class Town {
    */
   public addConversationArea(conversationArea: ConversationAreaModel): boolean {
     const area = this._interactables.find(
-      eachArea => eachArea.id === conversationArea.id,
+      (eachArea) => eachArea.id === conversationArea.id
     ) as ConversationArea;
     if (!area || !conversationArea.topic || area.topic) {
       return false;
     }
     area.topic = conversationArea.topic;
     area.addPlayersWithinBounds(this._players);
-    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    this._broadcastEmitter.emit("interactableUpdate", area.toModel());
     return true;
   }
 
@@ -283,15 +291,14 @@ export default class Town {
    */
   public addViewingArea(viewingArea: ViewingAreaModel): boolean {
     const area = this._interactables.find(
-      eachArea => eachArea.id === viewingArea.id,
+      (eachArea) => eachArea.id === viewingArea.id
     ) as ViewingArea;
     if (!area || !viewingArea.video || area.video) {
-      
       return false;
     }
     area.updateModel(viewingArea);
     area.addPlayersWithinBounds(this._players);
-    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    this._broadcastEmitter.emit("interactableUpdate", area.toModel());
     return true;
   }
 
@@ -313,19 +320,24 @@ export default class Town {
    * poster session area with the specified ID or if there is already an active poster session area
    * with the specified ID or if there is no poster image and title specified
    */
-  public addPosterSessionArea(posterSessionArea: PosterSessionAreaModel): boolean {
-    
+  public addPosterSessionArea(
+    posterSessionArea: PosterSessionAreaModel
+  ): boolean {
     const area = this._interactables.find(
-      eachArea => eachArea.id === posterSessionArea.id
+      (eachArea) => eachArea.id === posterSessionArea.id
     ) as PosterSessionArea;
-    if (!area || !posterSessionArea.title || !posterSessionArea.imageContents || area.title) {
+    if (
+      !area ||
+      !posterSessionArea.title ||
+      !posterSessionArea.imageContents ||
+      area.title
+    ) {
       return false;
     }
     area.updateModel(posterSessionArea);
     area.addPlayersWithinBounds(this._players);
-    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
+    this._broadcastEmitter.emit("interactableUpdate", area.toModel());
     return true;
-
   }
 
   /**
@@ -335,7 +347,7 @@ export default class Town {
    * @param token
    */
   public getPlayerBySessionToken(token: string): Player | undefined {
-    return this.players.find(eachPlayer => eachPlayer.sessionToken === token);
+    return this.players.find((eachPlayer) => eachPlayer.sessionToken === token);
   }
 
   /**
@@ -346,8 +358,10 @@ export default class Town {
    * @throws Error if no such interactable exists
    */
   public getInteractable(id: string): InteractableArea {
-    const ret = this._interactables.find(eachInteractable => eachInteractable.id === id);
-    if (!ret) {
+    const ret = this._interactables.find(
+      (eachInteractable) => eachInteractable.id === id
+    );
+    if (ret == null) {
       throw new Error(`No such interactable ${id}`);
     }
     return ret;
@@ -358,8 +372,8 @@ export default class Town {
    * disconnects all players.
    */
   public disconnectAllPlayers(): void {
-    this._broadcastEmitter.emit('townClosing');
-    this._connectedSockets.forEach(eachSocket => eachSocket.disconnect(true));
+    this._broadcastEmitter.emit("townClosing");
+    this._connectedSockets.forEach((eachSocket) => eachSocket.disconnect(true));
   }
 
   /**
@@ -380,25 +394,27 @@ export default class Town {
    */
   public initializeFromMap(map: ITiledMap) {
     const objectLayer = map.layers.find(
-      eachLayer => eachLayer.name === 'Objects',
+      (eachLayer) => eachLayer.name === "Objects"
     ) as ITiledMapObjectLayer;
     if (!objectLayer) {
-      throw new Error(`Unable to find objects layer in map`);
+      throw new Error("Unable to find objects layer in map");
     }
     const viewingAreas = objectLayer.objects
-      .filter(eachObject => eachObject.type === 'ViewingArea')
-      .map(eachViewingAreaObject =>
-        ViewingArea.fromMapObject(eachViewingAreaObject, this._broadcastEmitter),
+      .filter((eachObject) => eachObject.type === "ViewingArea")
+      .map((eachViewingAreaObject) =>
+        ViewingArea.fromMapObject(eachViewingAreaObject, this._broadcastEmitter)
       );
 
     const conversationAreas = objectLayer.objects
-      .filter(eachObject => eachObject.type === 'ConversationArea')
-      .map(eachConvAreaObj =>
-        ConversationArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter),
+      .filter((eachObject) => eachObject.type === "ConversationArea")
+      .map((eachConvAreaObj) =>
+        ConversationArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter)
       );
     const posterSessionAreas = objectLayer.objects
-      .filter(eachObject => eachObject.type === 'PosterSessionArea')
-      .map(eachPSAreaObj => PosterSessionArea.fromMapObject(eachPSAreaObj, this._broadcastEmitter));
+      .filter((eachObject) => eachObject.type === "PosterSessionArea")
+      .map((eachPSAreaObj) =>
+        PosterSessionArea.fromMapObject(eachPSAreaObj, this._broadcastEmitter)
+      );
 
     this._interactables = this._interactables
       .concat(viewingAreas)
@@ -410,22 +426,28 @@ export default class Town {
 
   private _validateInteractables() {
     // Make sure that the IDs are unique
-    const interactableIDs = this._interactables.map(eachInteractable => eachInteractable.id);
+    const interactableIDs = this._interactables.map(
+      (eachInteractable) => eachInteractable.id
+    );
     if (
       interactableIDs.some(
-        item => interactableIDs.indexOf(item) !== interactableIDs.lastIndexOf(item),
+        (item) =>
+          interactableIDs.indexOf(item) !== interactableIDs.lastIndexOf(item)
       )
     ) {
       throw new Error(
-        `Expected all interactable IDs to be unique, but found duplicate interactable ID in ${interactableIDs}`,
+        `Expected all interactable IDs to be unique, but found duplicate interactable ID in ${interactableIDs}`
       );
     }
     // Make sure that there are no overlapping objects
     for (const interactable of this._interactables) {
       for (const otherInteractable of this._interactables) {
-        if (interactable !== otherInteractable && interactable.overlaps(otherInteractable)) {
+        if (
+          interactable !== otherInteractable &&
+          interactable.overlaps(otherInteractable)
+        ) {
           throw new Error(
-            `Expected interactables not to overlap, but found overlap between ${interactable.id} and ${otherInteractable.id}`,
+            `Expected interactables not to overlap, but found overlap between ${interactable.id} and ${otherInteractable.id}`
           );
         }
       }
