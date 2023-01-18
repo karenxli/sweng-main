@@ -1,14 +1,14 @@
-import { ITiledMap } from "@jonbell/tiled-map-type-guard";
+import { ITiledMap } from '@jonbell/tiled-map-type-guard';
 import {
   DeepMockProxy,
   mockClear,
   mockDeep,
   mockReset,
-} from "jest-mock-extended";
-import { nanoid } from "nanoid";
-import { DisconnectReason } from "socket.io/dist/socket";
-import Player from "../lib/Player";
-import TwilioVideo from "../lib/TwilioVideo";
+} from 'jest-mock-extended';
+import { nanoid } from 'nanoid';
+import { DisconnectReason } from 'socket.io/dist/socket';
+import Player from '../lib/Player';
+import TwilioVideo from '../lib/TwilioVideo';
 import {
   ClientEventTypes,
   expectArraysToContainSameMembers,
@@ -16,7 +16,7 @@ import {
   getLastEmittedEvent,
   MockedPlayer,
   mockPlayer,
-} from "../TestUtils";
+} from '../TestUtils';
 import {
   ChatMessage,
   Interactable,
@@ -24,33 +24,33 @@ import {
   TownEmitter,
   ViewingArea as ViewingAreaModel,
   PosterSessionArea as PosterSessionAreaModel,
-} from "../types/CoveyTownSocket";
-import ConversationArea from "./ConversationArea";
-import Town from "./Town";
+} from '../types/CoveyTownSocket';
+import ConversationArea from './ConversationArea';
+import Town from './Town';
 
 const mockTwilioVideo = mockDeep<TwilioVideo>();
-jest.spyOn(TwilioVideo, "getInstance").mockReturnValue(mockTwilioVideo);
+jest.spyOn(TwilioVideo, 'getInstance').mockReturnValue(mockTwilioVideo);
 
 type TestMapDict = {
   [key in string]: ITiledMap;
 };
 const testingMaps: TestMapDict = {
   twoConv: {
-    tiledversion: "1.9.0",
+    tiledversion: '1.9.0',
     tileheight: 32,
     tilesets: [],
     tilewidth: 32,
-    type: "map",
+    type: 'map',
     layers: [
       {
         id: 4,
-        name: "Objects",
+        name: 'Objects',
         objects: [
           {
-            type: "ConversationArea",
+            type: 'ConversationArea',
             height: 237,
             id: 39,
-            name: "Name1",
+            name: 'Name1',
             rotation: 0,
             visible: true,
             width: 326,
@@ -58,10 +58,10 @@ const testingMaps: TestMapDict = {
             y: 120,
           },
           {
-            type: "ConversationArea",
+            type: 'ConversationArea',
             height: 266,
             id: 43,
-            name: "Name2",
+            name: 'Name2',
             rotation: 0,
             visible: true,
             width: 467,
@@ -70,7 +70,7 @@ const testingMaps: TestMapDict = {
           },
         ],
         opacity: 1,
-        type: "objectgroup",
+        type: 'objectgroup',
         visible: true,
         x: 0,
         y: 0,
@@ -78,21 +78,21 @@ const testingMaps: TestMapDict = {
     ],
   },
   overlapping: {
-    tiledversion: "1.9.0",
+    tiledversion: '1.9.0',
     tileheight: 32,
     tilesets: [],
     tilewidth: 32,
-    type: "map",
+    type: 'map',
     layers: [
       {
         id: 4,
-        name: "Objects",
+        name: 'Objects',
         objects: [
           {
-            type: "ConversationArea",
+            type: 'ConversationArea',
             height: 237,
             id: 39,
-            name: "Name1",
+            name: 'Name1',
             rotation: 0,
             visible: true,
             width: 326,
@@ -100,10 +100,10 @@ const testingMaps: TestMapDict = {
             y: 120,
           },
           {
-            type: "ConversationArea",
+            type: 'ConversationArea',
             height: 266,
             id: 43,
-            name: "Name2",
+            name: 'Name2',
             rotation: 0,
             visible: true,
             width: 467,
@@ -112,7 +112,7 @@ const testingMaps: TestMapDict = {
           },
         ],
         opacity: 1,
-        type: "objectgroup",
+        type: 'objectgroup',
         visible: true,
         x: 0,
         y: 0,
@@ -120,29 +120,29 @@ const testingMaps: TestMapDict = {
     ],
   },
   noObjects: {
-    tiledversion: "1.9.0",
+    tiledversion: '1.9.0',
     tileheight: 32,
     tilesets: [],
     tilewidth: 32,
-    type: "map",
+    type: 'map',
     layers: [],
   },
   duplicateNames: {
-    tiledversion: "1.9.0",
+    tiledversion: '1.9.0',
     tileheight: 32,
     tilesets: [],
     tilewidth: 32,
-    type: "map",
+    type: 'map',
     layers: [
       {
         id: 4,
-        name: "Objects",
+        name: 'Objects',
         objects: [
           {
-            type: "ConversationArea",
+            type: 'ConversationArea',
             height: 237,
             id: 39,
-            name: "Name1",
+            name: 'Name1',
             rotation: 0,
             visible: true,
             width: 326,
@@ -150,10 +150,10 @@ const testingMaps: TestMapDict = {
             y: 120,
           },
           {
-            type: "ConversationArea",
+            type: 'ConversationArea',
             height: 266,
             id: 43,
-            name: "Name1",
+            name: 'Name1',
             rotation: 0,
             visible: true,
             width: 467,
@@ -162,7 +162,7 @@ const testingMaps: TestMapDict = {
           },
         ],
         opacity: 1,
-        type: "objectgroup",
+        type: 'objectgroup',
         visible: true,
         x: 0,
         y: 0,
@@ -170,21 +170,21 @@ const testingMaps: TestMapDict = {
     ],
   },
   twoViewing: {
-    tiledversion: "1.9.0",
+    tiledversion: '1.9.0',
     tileheight: 32,
     tilesets: [],
     tilewidth: 32,
-    type: "map",
+    type: 'map',
     layers: [
       {
         id: 4,
-        name: "Objects",
+        name: 'Objects',
         objects: [
           {
-            type: "ViewingArea",
+            type: 'ViewingArea',
             height: 237,
             id: 39,
-            name: "Name1",
+            name: 'Name1',
             rotation: 0,
             visible: true,
             width: 326,
@@ -192,10 +192,10 @@ const testingMaps: TestMapDict = {
             y: 120,
           },
           {
-            type: "ViewingArea",
+            type: 'ViewingArea',
             height: 266,
             id: 43,
-            name: "Name2",
+            name: 'Name2',
             rotation: 0,
             visible: true,
             width: 467,
@@ -204,7 +204,7 @@ const testingMaps: TestMapDict = {
           },
         ],
         opacity: 1,
-        type: "objectgroup",
+        type: 'objectgroup',
         visible: true,
         x: 0,
         y: 0,
@@ -212,21 +212,21 @@ const testingMaps: TestMapDict = {
     ],
   },
   twoConvOneViewing: {
-    tiledversion: "1.9.0",
+    tiledversion: '1.9.0',
     tileheight: 32,
     tilesets: [],
     tilewidth: 32,
-    type: "map",
+    type: 'map',
     layers: [
       {
         id: 4,
-        name: "Objects",
+        name: 'Objects',
         objects: [
           {
-            type: "ConversationArea",
+            type: 'ConversationArea',
             height: 237,
             id: 39,
-            name: "Name1",
+            name: 'Name1',
             rotation: 0,
             visible: true,
             width: 326,
@@ -234,10 +234,10 @@ const testingMaps: TestMapDict = {
             y: 120,
           },
           {
-            type: "ConversationArea",
+            type: 'ConversationArea',
             height: 266,
             id: 43,
-            name: "Name2",
+            name: 'Name2',
             rotation: 0,
             visible: true,
             width: 467,
@@ -245,15 +245,15 @@ const testingMaps: TestMapDict = {
             y: 120,
           },
           {
-            type: "ViewingArea",
+            type: 'ViewingArea',
             height: 237,
             id: 54,
-            name: "Name3",
+            name: 'Name3',
             properties: [
               {
-                name: "video",
-                type: "string",
-                value: "someURL",
+                name: 'video',
+                type: 'string',
+                value: 'someURL',
               },
             ],
             rotation: 0,
@@ -264,7 +264,7 @@ const testingMaps: TestMapDict = {
           },
         ],
         opacity: 1,
-        type: "objectgroup",
+        type: 'objectgroup',
         visible: true,
         x: 0,
         y: 0,
@@ -272,21 +272,21 @@ const testingMaps: TestMapDict = {
     ],
   },
   twoConvTwoViewing: {
-    tiledversion: "1.9.0",
+    tiledversion: '1.9.0',
     tileheight: 32,
     tilesets: [],
     tilewidth: 32,
-    type: "map",
+    type: 'map',
     layers: [
       {
         id: 4,
-        name: "Objects",
+        name: 'Objects',
         objects: [
           {
-            type: "ConversationArea",
+            type: 'ConversationArea',
             height: 237,
             id: 39,
-            name: "Name1",
+            name: 'Name1',
             rotation: 0,
             visible: true,
             width: 326,
@@ -294,10 +294,10 @@ const testingMaps: TestMapDict = {
             y: 120,
           },
           {
-            type: "ConversationArea",
+            type: 'ConversationArea',
             height: 266,
             id: 43,
-            name: "Name2",
+            name: 'Name2',
             rotation: 0,
             visible: true,
             width: 467,
@@ -305,15 +305,15 @@ const testingMaps: TestMapDict = {
             y: 120,
           },
           {
-            type: "ViewingArea",
+            type: 'ViewingArea',
             height: 237,
             id: 54,
-            name: "Name3",
+            name: 'Name3',
             properties: [
               {
-                name: "video",
-                type: "string",
-                value: "someURL",
+                name: 'video',
+                type: 'string',
+                value: 'someURL',
               },
             ],
             rotation: 0,
@@ -323,15 +323,15 @@ const testingMaps: TestMapDict = {
             y: 566,
           },
           {
-            type: "ViewingArea",
+            type: 'ViewingArea',
             height: 237,
             id: 55,
-            name: "Name4",
+            name: 'Name4',
             properties: [
               {
-                name: "video",
-                type: "string",
-                value: "someURL",
+                name: 'video',
+                type: 'string',
+                value: 'someURL',
               },
             ],
             rotation: 0,
@@ -342,7 +342,7 @@ const testingMaps: TestMapDict = {
           },
         ],
         opacity: 1,
-        type: "objectgroup",
+        type: 'objectgroup',
         visible: true,
         x: 0,
         y: 0,
@@ -350,21 +350,21 @@ const testingMaps: TestMapDict = {
     ],
   },
   twoConvTwoPoster: {
-    tiledversion: "1.9.0",
+    tiledversion: '1.9.0',
     tileheight: 32,
     tilesets: [],
     tilewidth: 32,
-    type: "map",
+    type: 'map',
     layers: [
       {
         id: 4,
-        name: "Objects",
+        name: 'Objects',
         objects: [
           {
-            type: "ConversationArea",
+            type: 'ConversationArea',
             height: 237,
             id: 39,
-            name: "Name1",
+            name: 'Name1',
             rotation: 0,
             visible: true,
             width: 326,
@@ -372,10 +372,10 @@ const testingMaps: TestMapDict = {
             y: 120,
           },
           {
-            type: "ConversationArea",
+            type: 'ConversationArea',
             height: 266,
             id: 43,
-            name: "Name2",
+            name: 'Name2',
             rotation: 0,
             visible: true,
             width: 467,
@@ -383,20 +383,20 @@ const testingMaps: TestMapDict = {
             y: 120,
           },
           {
-            type: "PosterSessionArea",
+            type: 'PosterSessionArea',
             height: 237,
             id: 54,
-            name: "Name3",
+            name: 'Name3',
             properties: [
               {
-                name: "title",
-                type: "string",
-                value: "somename",
+                name: 'title',
+                type: 'string',
+                value: 'somename',
               },
               {
-                name: "imageContents",
-                type: "string",
-                value: "somename",
+                name: 'imageContents',
+                type: 'string',
+                value: 'somename',
               },
             ],
             rotation: 0,
@@ -406,20 +406,20 @@ const testingMaps: TestMapDict = {
             y: 566,
           },
           {
-            type: "PosterSessionArea",
+            type: 'PosterSessionArea',
             height: 237,
             id: 55,
-            name: "Name4",
+            name: 'Name4',
             properties: [
               {
-                name: "title",
-                type: "string",
-                value: "somename",
+                name: 'title',
+                type: 'string',
+                value: 'somename',
               },
               {
-                name: "imageContents",
-                type: "string",
-                value: "somename",
+                name: 'imageContents',
+                type: 'string',
+                value: 'somename',
               },
             ],
             rotation: 0,
@@ -430,7 +430,7 @@ const testingMaps: TestMapDict = {
           },
         ],
         opacity: 1,
-        type: "objectgroup",
+        type: 'objectgroup',
         visible: true,
         x: 0,
         y: 0,
@@ -439,7 +439,7 @@ const testingMaps: TestMapDict = {
   },
 };
 
-describe("Town", () => {
+describe('Town', () => {
   const townEmitter: DeepMockProxy<TownEmitter> = mockDeep<TownEmitter>();
   let town: Town;
   let player: Player;
@@ -459,7 +459,7 @@ describe("Town", () => {
     mockReset(townEmitter);
   });
 
-  it("constructor should set its properties", () => {
+  it('constructor should set its properties', () => {
     const townName = `FriendlyNameTest-${nanoid()}`;
     const townID = nanoid();
     const testTown = new Town(townName, true, townID, townEmitter);
@@ -467,8 +467,8 @@ describe("Town", () => {
     expect(testTown.townID).toBe(townID);
     expect(testTown.isPubliclyListed).toBe(true);
   });
-  describe("addPlayer", () => {
-    it("should use the townID and player ID properties when requesting a video token", async () => {
+  describe('addPlayer', () => {
+    it('should use the townID and player ID properties when requesting a video token', async () => {
       const newPlayer = mockPlayer(town.townID);
       mockTwilioVideo.getTokenForTown.mockClear();
       const newPlayerObj = await town.addPlayer(
@@ -482,12 +482,12 @@ describe("Town", () => {
         newPlayerObj.id
       );
     });
-    it("should register callbacks for all client-to-server events", () => {
+    it('should register callbacks for all client-to-server events', () => {
       const expectedEvents: ClientEventTypes[] = [
-        "disconnect",
-        "chatMessage",
-        "playerMovement",
-        "interactableUpdate",
+        'disconnect',
+        'chatMessage',
+        'playerMovement',
+        'interactableUpdate',
       ];
       expectedEvents.forEach((eachEvent) => {
         expect(
@@ -495,39 +495,39 @@ describe("Town", () => {
         ).toBeDefined();
       });
     });
-    describe("[T1] interactableUpdate callback", () => {
+    describe('[T1] interactableUpdate callback', () => {
       let interactableUpdateHandler: (update: Interactable) => void;
       beforeEach(() => {
         town.initializeFromMap(testingMaps.twoConvTwoViewing);
         interactableUpdateHandler = getEventListener(
           playerTestData.socket,
-          "interactableUpdate"
+          'interactableUpdate'
         );
       });
-      it("Should not throw an error for any interactable area that is not a viewing area", () => {
+      it('Should not throw an error for any interactable area that is not a viewing area', () => {
         expect(() => {
           interactableUpdateHandler({
-            id: "Name1",
+            id: 'Name1',
             topic: nanoid(),
             occupantsByID: [],
           });
         }).not.toThrowError();
       });
-      it("Should not throw an error if there is no such viewing area", () => {
+      it('Should not throw an error if there is no such viewing area', () => {
         expect(() => {
           interactableUpdateHandler({
-            id: "NotActuallyAnInteractable",
+            id: 'NotActuallyAnInteractable',
             topic: nanoid(),
             occupantsByID: [],
           });
         }).not.toThrowError();
       });
-      describe("When called passing a valid viewing area", () => {
+      describe('When called passing a valid viewing area', () => {
         let newArea: ViewingAreaModel;
         let secondPlayer: MockedPlayer;
         beforeEach(async () => {
           newArea = {
-            id: "Name4",
+            id: 'Name4',
             elapsedTimeSec: 0,
             isPlaying: true,
             video: nanoid(),
@@ -549,42 +549,42 @@ describe("Town", () => {
           const updatedArea = town.getInteractable(newArea.id);
           expect(updatedArea.toModel()).toEqual(newArea);
         });
-        it("Should update the model for the viewing area", () => {
+        it('Should update the model for the viewing area', () => {
           const lastUpdate = getLastEmittedEvent(
             playerTestData.socketToRoomMock,
-            "interactableUpdate"
+            'interactableUpdate'
           );
           expect(lastUpdate).toEqual(newArea);
         });
-        it("Should not emit interactableUpdate events to players directly, or to the whole town", () => {
+        it('Should not emit interactableUpdate events to players directly, or to the whole town', () => {
           expect(() =>
-            getLastEmittedEvent(playerTestData.socket, "interactableUpdate")
+            getLastEmittedEvent(playerTestData.socket, 'interactableUpdate')
           ).toThrowError();
           expect(() =>
-            getLastEmittedEvent(townEmitter, "interactableUpdate")
+            getLastEmittedEvent(townEmitter, 'interactableUpdate')
           ).toThrowError();
           expect(() =>
-            getLastEmittedEvent(secondPlayer.socket, "interactableUpdate")
+            getLastEmittedEvent(secondPlayer.socket, 'interactableUpdate')
           ).toThrowError();
           expect(() =>
             getLastEmittedEvent(
               secondPlayer.socketToRoomMock,
-              "interactableUpdate"
+              'interactableUpdate'
             )
           ).toThrowError();
         });
       });
     });
   });
-  describe("Socket event listeners created in addPlayer", () => {
-    describe("on socket disconnect", () => {
+  describe('Socket event listeners created in addPlayer', () => {
+    describe('on socket disconnect', () => {
       function disconnectPlayer(playerToLeave: MockedPlayer) {
         // Call the disconnect event handler
         const disconnectHandler = getEventListener(
           playerToLeave.socket,
-          "disconnect"
+          'disconnect'
         );
-        disconnectHandler(<DisconnectReason>"unknown");
+        disconnectHandler(<DisconnectReason>'unknown');
       }
       it("Invalidates the players's session token", async () => {
         const token = player.sessionToken;
@@ -594,57 +594,57 @@ describe("Town", () => {
 
         expect(town.getPlayerBySessionToken(token)).toEqual(undefined);
       });
-      it("Informs all other players of the disconnection using the broadcast emitter", () => {
+      it('Informs all other players of the disconnection using the broadcast emitter', () => {
         const playerToLeaveID = player.id;
 
         disconnectPlayer(playerTestData);
         const callToDisconnect = getLastEmittedEvent(
           townEmitter,
-          "playerDisconnect"
+          'playerDisconnect'
         );
         expect(callToDisconnect.id).toEqual(playerToLeaveID);
       });
-      it("Removes the player from any active conversation area", () => {
+      it('Removes the player from any active conversation area', () => {
         // Load in a map with a conversation area
         town.initializeFromMap(testingMaps.twoConvOneViewing);
         playerTestData.moveTo(45, 122); // Inside of "Name1" area
         expect(
           town.addConversationArea({
-            id: "Name1",
-            topic: "test",
+            id: 'Name1',
+            topic: 'test',
             occupantsByID: [],
           })
         ).toBeTruthy();
-        const convArea = town.getInteractable("Name1") as ConversationArea;
+        const convArea = town.getInteractable('Name1') as ConversationArea;
         expect(convArea.occupantsByID).toEqual([player.id]);
         disconnectPlayer(playerTestData);
         expect(convArea.occupantsByID).toEqual([]);
         expect(town.occupancy).toBe(0);
       });
 
-      it("Removes the player from any active viewing area", () => {
+      it('Removes the player from any active viewing area', () => {
         // Load in a map with a conversation area
         town.initializeFromMap(testingMaps.twoConvOneViewing);
         playerTestData.moveTo(156, 567); // Inside of "Name3" area
         expect(
           town.addViewingArea({
-            id: "Name3",
+            id: 'Name3',
             isPlaying: true,
             elapsedTimeSec: 0,
             video: nanoid(),
           })
         ).toBeTruthy();
-        const viewingArea = town.getInteractable("Name3");
+        const viewingArea = town.getInteractable('Name3');
         expect(viewingArea.occupantsByID).toEqual([player.id]);
         disconnectPlayer(playerTestData);
         expect(viewingArea.occupantsByID).toEqual([]);
       });
     });
-    describe("playerMovement", () => {
+    describe('playerMovement', () => {
       const newLocation: PlayerLocation = {
         x: 100,
         y: 100,
-        rotation: "back",
+        rotation: 'back',
         moving: true,
       };
 
@@ -657,10 +657,10 @@ describe("Town", () => {
         );
       });
 
-      it("Emits a playerMoved event", () => {
+      it('Emits a playerMoved event', () => {
         const lastEmittedMovement = getLastEmittedEvent(
           townEmitter,
-          "playerMoved"
+          'playerMoved'
         );
         expect(lastEmittedMovement.id).toEqual(playerTestData.player?.id);
         expect(lastEmittedMovement.location).toEqual(newLocation);
@@ -669,7 +669,7 @@ describe("Town", () => {
         expect(player.location).toEqual(newLocation);
       });
     });
-    describe("interactableUpdate", () => {
+    describe('interactableUpdate', () => {
       let interactableUpdateCallback: (update: Interactable) => void;
       let update: ViewingAreaModel;
       beforeEach(async () => {
@@ -677,44 +677,44 @@ describe("Town", () => {
         playerTestData.moveTo(156, 567); // Inside of "Name3" viewing area
         interactableUpdateCallback = getEventListener(
           playerTestData.socket,
-          "interactableUpdate"
+          'interactableUpdate'
         );
         update = {
-          id: "Name3",
+          id: 'Name3',
           isPlaying: true,
           elapsedTimeSec: 100,
           video: nanoid(),
         };
         interactableUpdateCallback(update);
       });
-      it("forwards updates to others in the town", () => {
+      it('forwards updates to others in the town', () => {
         const lastEvent = getLastEmittedEvent(
           playerTestData.socketToRoomMock,
-          "interactableUpdate"
+          'interactableUpdate'
         );
         expect(lastEvent).toEqual(update);
       });
-      it("does not forward updates to the ENTIRE town", () => {
+      it('does not forward updates to the ENTIRE town', () => {
         expect(
           // getLastEmittedEvent will throw an error if no event was emitted, which we expect to be the case here
-          () => getLastEmittedEvent(townEmitter, "interactableUpdate")
+          () => getLastEmittedEvent(townEmitter, 'interactableUpdate')
         ).toThrowError();
       });
-      it("updates the local model for that interactable", () => {
+      it('updates the local model for that interactable', () => {
         const interactable = town.getInteractable(update.id);
         expect(interactable?.toModel()).toEqual(update);
       });
     });
-    it("Forwards chat messages to players with the same ID as the message ID", async () => {
+    it('Forwards chat messages to players with the same ID as the message ID', async () => {
       const chatHandler = getEventListener(
         playerTestData.socket,
-        "chatMessage"
+        'chatMessage'
       );
       const chatMessage: ChatMessage = {
         author: player.id,
-        body: "Test message",
+        body: 'Test message',
         dateCreated: new Date(),
-        sid: "test message id",
+        sid: 'test message id',
         interactableId: player.location?.interactableID,
       };
 
@@ -722,35 +722,35 @@ describe("Town", () => {
 
       const emittedMessage = getLastEmittedEvent(
         playerTestData.socket,
-        "chatMessage"
+        'chatMessage'
       );
       expect(emittedMessage).toEqual(chatMessage);
     });
-    it("Does not forward chat messages to players if the message ID doesnt match the player area", async () => {
+    it('Does not forward chat messages to players if the message ID doesnt match the player area', async () => {
       const chatHandler = getEventListener(
         playerTestData.socket,
-        "chatMessage"
+        'chatMessage'
       );
       const chatMessage: ChatMessage = {
         author: player.id,
-        body: "Test message",
+        body: 'Test message',
         dateCreated: new Date(),
-        sid: "test message id",
-        interactableId: "random id",
+        sid: 'test message id',
+        interactableId: 'random id',
       };
 
       chatHandler(chatMessage);
 
       expect(() => {
-        getLastEmittedEvent(playerTestData.socket, "chatMessage");
+        getLastEmittedEvent(playerTestData.socket, 'chatMessage');
       }).toThrowError();
     });
   });
-  describe("addConversationArea", () => {
+  describe('addConversationArea', () => {
     beforeEach(async () => {
       town.initializeFromMap(testingMaps.twoConvOneViewing);
     });
-    it("Should return false if no area exists with that ID", () => {
+    it('Should return false if no area exists with that ID', () => {
       expect(
         town.addConversationArea({
           id: nanoid(),
@@ -759,72 +759,72 @@ describe("Town", () => {
         })
       ).toEqual(false);
     });
-    it("Should return false if the requested topic is empty", () => {
+    it('Should return false if the requested topic is empty', () => {
       expect(
-        town.addConversationArea({ id: "Name1", topic: "", occupantsByID: [] })
+        town.addConversationArea({ id: 'Name1', topic: '', occupantsByID: [] })
       ).toEqual(false);
       expect(
         town.addConversationArea({
-          id: "Name1",
+          id: 'Name1',
           topic: undefined,
           occupantsByID: [],
         })
       ).toEqual(false);
     });
-    it("Should return false if the area already has a topic", () => {
+    it('Should return false if the area already has a topic', () => {
       expect(
         town.addConversationArea({
-          id: "Name1",
-          topic: "new topic",
+          id: 'Name1',
+          topic: 'new topic',
           occupantsByID: [],
         })
       ).toEqual(true);
       expect(
         town.addConversationArea({
-          id: "Name1",
-          topic: "new new topic",
+          id: 'Name1',
+          topic: 'new new topic',
           occupantsByID: [],
         })
       ).toEqual(false);
     });
-    describe("When successful", () => {
-      const newTopic = "new topic";
+    describe('When successful', () => {
+      const newTopic = 'new topic';
       beforeEach(() => {
         playerTestData.moveTo(45, 122); // Inside of "Name1" area
         expect(
           town.addConversationArea({
-            id: "Name1",
+            id: 'Name1',
             topic: newTopic,
             occupantsByID: [],
           })
         ).toEqual(true);
       });
-      it("Should update the local model for that area", () => {
-        const convArea = town.getInteractable("Name1") as ConversationArea;
+      it('Should update the local model for that area', () => {
+        const convArea = town.getInteractable('Name1') as ConversationArea;
         expect(convArea.topic).toEqual(newTopic);
       });
-      it("Should include any players in that area as occupants", () => {
-        const convArea = town.getInteractable("Name1") as ConversationArea;
+      it('Should include any players in that area as occupants', () => {
+        const convArea = town.getInteractable('Name1') as ConversationArea;
         expect(convArea.occupantsByID).toEqual([player.id]);
       });
-      it("Should emit an interactableUpdate message", () => {
+      it('Should emit an interactableUpdate message', () => {
         const lastEmittedUpdate = getLastEmittedEvent(
           townEmitter,
-          "interactableUpdate"
+          'interactableUpdate'
         );
         expect(lastEmittedUpdate).toEqual({
-          id: "Name1",
+          id: 'Name1',
           topic: newTopic,
           occupantsByID: [player.id],
         });
       });
     });
   });
-  describe("[T1] addViewingArea", () => {
+  describe('[T1] addViewingArea', () => {
     beforeEach(async () => {
       town.initializeFromMap(testingMaps.twoConvOneViewing);
     });
-    it("Should return false if no area exists with that ID", () => {
+    it('Should return false if no area exists with that ID', () => {
       expect(
         town.addViewingArea({
           id: nanoid(),
@@ -834,45 +834,45 @@ describe("Town", () => {
         })
       ).toBe(false);
     });
-    it("Should return false if the requested video is empty", () => {
+    it('Should return false if the requested video is empty', () => {
       expect(
         town.addViewingArea({
-          id: "Name3",
+          id: 'Name3',
           isPlaying: false,
           elapsedTimeSec: 0,
-          video: "",
+          video: '',
         })
       ).toBe(false);
       expect(
         town.addViewingArea({
-          id: "Name3",
+          id: 'Name3',
           isPlaying: false,
           elapsedTimeSec: 0,
           video: undefined,
         })
       ).toBe(false);
     });
-    it("Should return false if the area is already active", () => {
+    it('Should return false if the area is already active', () => {
       expect(
         town.addViewingArea({
-          id: "Name3",
+          id: 'Name3',
           isPlaying: false,
           elapsedTimeSec: 0,
-          video: "test",
+          video: 'test',
         })
       ).toBe(true);
       expect(
         town.addViewingArea({
-          id: "Name3",
+          id: 'Name3',
           isPlaying: false,
           elapsedTimeSec: 0,
-          video: "test2",
+          video: 'test2',
         })
       ).toBe(false);
     });
-    describe("When successful", () => {
+    describe('When successful', () => {
       const newModel: ViewingAreaModel = {
-        id: "Name3",
+        id: 'Name3',
         isPlaying: true,
         elapsedTimeSec: 100,
         video: nanoid(),
@@ -882,30 +882,30 @@ describe("Town", () => {
         expect(town.addViewingArea(newModel)).toBe(true);
       });
 
-      it("Should update the local model for that area", () => {
-        const viewingArea = town.getInteractable("Name3");
+      it('Should update the local model for that area', () => {
+        const viewingArea = town.getInteractable('Name3');
         expect(viewingArea.toModel()).toEqual(newModel);
       });
 
-      it("Should emit an interactableUpdate message", () => {
+      it('Should emit an interactableUpdate message', () => {
         const lastEmittedUpdate = getLastEmittedEvent(
           townEmitter,
-          "interactableUpdate"
+          'interactableUpdate'
         );
         expect(lastEmittedUpdate).toEqual(newModel);
       });
-      it("Should include any players in that area as occupants", () => {
-        const viewingArea = town.getInteractable("Name3");
+      it('Should include any players in that area as occupants', () => {
+        const viewingArea = town.getInteractable('Name3');
         expect(viewingArea.occupantsByID).toEqual([player.id]);
       });
     });
   });
 
-  describe("[T1] addPosterSessionArea", () => {
+  describe('[T1] addPosterSessionArea', () => {
     beforeEach(async () => {
       town.initializeFromMap(testingMaps.twoConvTwoPoster);
     });
-    it("Should return false if no area exists with that ID", () => {
+    it('Should return false if no area exists with that ID', () => {
       expect(
         town.addPosterSessionArea({
           id: nanoid(),
@@ -915,102 +915,102 @@ describe("Town", () => {
         })
       ).toBe(false);
     });
-    it("Should return false if the requested title is empty", () => {
+    it('Should return false if the requested title is empty', () => {
       expect(
         town.addPosterSessionArea({
-          id: "Name3",
+          id: 'Name3',
           stars: 0,
-          imageContents: "abcde.png",
-          title: "",
+          imageContents: 'abcde.png',
+          title: '',
         })
       ).toBe(false);
       expect(
         town.addPosterSessionArea({
-          id: "Name3",
+          id: 'Name3',
           stars: 0,
-          imageContents: "abcde.png",
+          imageContents: 'abcde.png',
           title: undefined,
         })
       ).toBe(false);
     });
-    it("Should return false if the requested poster is empty", () => {
+    it('Should return false if the requested poster is empty', () => {
       expect(
         town.addPosterSessionArea({
-          id: "Name3",
+          id: 'Name3',
           stars: 0,
-          imageContents: "",
-          title: "hello there",
+          imageContents: '',
+          title: 'hello there',
         })
       ).toBe(false);
       expect(
         town.addPosterSessionArea({
-          id: "Name3",
+          id: 'Name3',
           stars: 0,
           imageContents: undefined,
-          title: "boo!",
+          title: 'boo!',
         })
       ).toBe(false);
     });
-    it("Should return false if the area is already active", () => {
+    it('Should return false if the area is already active', () => {
       expect(
         town.addPosterSessionArea({
-          id: "Name3",
+          id: 'Name3',
           stars: 0,
-          imageContents: "help me obiwan",
-          title: "hello there",
+          imageContents: 'help me obiwan',
+          title: 'hello there',
         })
       ).toBe(true);
       expect(
         town.addPosterSessionArea({
-          id: "Name3",
+          id: 'Name3',
           stars: 0,
-          imageContents: "youre my only hope",
-          title: "hello there2",
+          imageContents: 'youre my only hope',
+          title: 'hello there2',
         })
       ).toBe(false);
     });
-    describe("When successful", () => {
+    describe('When successful', () => {
       const newModel: PosterSessionAreaModel = {
-        id: "Name3",
+        id: 'Name3',
         stars: 5,
-        imageContents: "according to",
-        title: "all laws of aviation",
+        imageContents: 'according to',
+        title: 'all laws of aviation',
       };
       beforeEach(() => {
         playerTestData.moveTo(160, 570); // Inside of "Name7" area
         expect(town.addPosterSessionArea(newModel)).toBe(true);
       });
 
-      it("Should update the local model for that area", () => {
-        const posterArea = town.getInteractable("Name3");
+      it('Should update the local model for that area', () => {
+        const posterArea = town.getInteractable('Name3');
         expect(posterArea.toModel()).toEqual(newModel);
       });
 
-      it("Should emit an interactableUpdate message", () => {
+      it('Should emit an interactableUpdate message', () => {
         const lastEmittedUpdate = getLastEmittedEvent(
           townEmitter,
-          "interactableUpdate"
+          'interactableUpdate'
         );
         expect(lastEmittedUpdate).toEqual(newModel);
       });
-      it("Should include any players in that area as occupants", () => {
-        const posterArea = town.getInteractable("Name3");
+      it('Should include any players in that area as occupants', () => {
+        const posterArea = town.getInteractable('Name3');
         expect(posterArea.occupantsByID).toEqual([player.id]);
       });
     });
   });
-  describe("disconnectAllPlayers", () => {
+  describe('disconnectAllPlayers', () => {
     beforeEach(() => {
       town.disconnectAllPlayers();
     });
-    it("Should emit the townClosing event", () => {
-      getLastEmittedEvent(townEmitter, "townClosing"); // Throws an error if no event existed
+    it('Should emit the townClosing event', () => {
+      getLastEmittedEvent(townEmitter, 'townClosing'); // Throws an error if no event existed
     });
     it("Should disconnect each players's socket", () => {
       expect(playerTestData.socket.disconnect).toBeCalledWith(true);
     });
   });
-  describe("initializeFromMap", () => {
+  describe('initializeFromMap', () => {
     const expectInitializingFromMapToThrowError = (map: ITiledMap) => {
       expect(() => {
         town.initializeFromMap(map);
@@ -1019,24 +1019,24 @@ describe("Town", () => {
     it('Throws an error if there is no layer called "objects"', async () => {
       expectInitializingFromMapToThrowError(testingMaps.noObjects);
     });
-    it("Throws an error if there are duplicate interactable object IDs", async () => {
+    it('Throws an error if there are duplicate interactable object IDs', async () => {
       expectInitializingFromMapToThrowError(testingMaps.duplicateNames);
     });
-    it("Throws an error if there are overlapping objects", async () => {
+    it('Throws an error if there are overlapping objects', async () => {
       expectInitializingFromMapToThrowError(testingMaps.overlapping);
     });
-    it("Creates a ConversationArea instance for each region on the map", async () => {
+    it('Creates a ConversationArea instance for each region on the map', async () => {
       town.initializeFromMap(testingMaps.twoConv);
-      const conv1 = town.getInteractable("Name1");
-      const conv2 = town.getInteractable("Name2");
-      expect(conv1.id).toEqual("Name1");
+      const conv1 = town.getInteractable('Name1');
+      const conv2 = town.getInteractable('Name2');
+      expect(conv1.id).toEqual('Name1');
       expect(conv1.boundingBox).toEqual({
         x: 40,
         y: 120,
         height: 237,
         width: 326,
       });
-      expect(conv2.id).toEqual("Name2");
+      expect(conv2.id).toEqual('Name2');
       expect(conv2.boundingBox).toEqual({
         x: 612,
         y: 120,
@@ -1045,18 +1045,18 @@ describe("Town", () => {
       });
       expect(town.interactables.length).toBe(2);
     });
-    it("Creates a ViewingArea instance for each region on the map", async () => {
+    it('Creates a ViewingArea instance for each region on the map', async () => {
       town.initializeFromMap(testingMaps.twoViewing);
-      const viewingArea1 = town.getInteractable("Name1");
-      const viewingArea2 = town.getInteractable("Name2");
-      expect(viewingArea1.id).toEqual("Name1");
+      const viewingArea1 = town.getInteractable('Name1');
+      const viewingArea2 = town.getInteractable('Name2');
+      expect(viewingArea1.id).toEqual('Name1');
       expect(viewingArea1.boundingBox).toEqual({
         x: 40,
         y: 120,
         height: 237,
         width: 326,
       });
-      expect(viewingArea2.id).toEqual("Name2");
+      expect(viewingArea2.id).toEqual('Name2');
       expect(viewingArea2.boundingBox).toEqual({
         x: 612,
         y: 120,
@@ -1065,19 +1065,19 @@ describe("Town", () => {
       });
       expect(town.interactables.length).toBe(2);
     });
-    describe("Updating interactable state in playerMovements", () => {
+    describe('Updating interactable state in playerMovements', () => {
       beforeEach(async () => {
         town.initializeFromMap(testingMaps.twoConvOneViewing);
         playerTestData.moveTo(51, 121);
         expect(
           town.addConversationArea({
-            id: "Name1",
-            topic: "test",
+            id: 'Name1',
+            topic: 'test',
             occupantsByID: [],
           })
         ).toBe(true);
       });
-      it("Adds a player to a new interactable and sets their conversation label, if they move into it", async () => {
+      it('Adds a player to a new interactable and sets their conversation label, if they move into it', async () => {
         const newPlayer = mockPlayer(town.townID);
         const newPlayerObj = await town.addPlayer(
           newPlayer.userName,
@@ -1086,41 +1086,41 @@ describe("Town", () => {
         newPlayer.moveTo(51, 121);
 
         // Check that the player's location was updated
-        expect(newPlayerObj.location.interactableID).toEqual("Name1");
+        expect(newPlayerObj.location.interactableID).toEqual('Name1');
 
         // Check that a movement event was emitted with the correct label
         const lastEmittedMovement = getLastEmittedEvent(
           townEmitter,
-          "playerMoved"
+          'playerMoved'
         );
-        expect(lastEmittedMovement.location.interactableID).toEqual("Name1");
+        expect(lastEmittedMovement.location.interactableID).toEqual('Name1');
 
         // Check that the conversation area occupants was updated
-        const occupants = town.getInteractable("Name1").occupantsByID;
+        const occupants = town.getInteractable('Name1').occupantsByID;
         expectArraysToContainSameMembers(occupants, [
           newPlayerObj.id,
           player.id,
         ]);
       });
-      it("Removes a player from their prior interactable and sets their conversation label, if they moved outside of it", () => {
-        expect(player.location.interactableID).toEqual("Name1");
+      it('Removes a player from their prior interactable and sets their conversation label, if they moved outside of it', () => {
+        expect(player.location.interactableID).toEqual('Name1');
         playerTestData.moveTo(0, 0);
         expect(player.location.interactableID).toBeUndefined();
       });
     });
   });
-  describe("Updating town settings", () => {
-    it("Emits townSettingsUpdated events when friendlyName changes", async () => {
+  describe('Updating town settings', () => {
+    it('Emits townSettingsUpdated events when friendlyName changes', async () => {
       const newFriendlyName = nanoid();
       town.friendlyName = newFriendlyName;
-      expect(townEmitter.emit).toBeCalledWith("townSettingsUpdated", {
+      expect(townEmitter.emit).toBeCalledWith('townSettingsUpdated', {
         friendlyName: newFriendlyName,
       });
     });
-    it("Emits townSettingsUpdated events when isPubliclyListed changes", async () => {
+    it('Emits townSettingsUpdated events when isPubliclyListed changes', async () => {
       const expected = !town.isPubliclyListed;
       town.isPubliclyListed = expected;
-      expect(townEmitter.emit).toBeCalledWith("townSettingsUpdated", {
+      expect(townEmitter.emit).toBeCalledWith('townSettingsUpdated', {
         isPubliclyListed: expected,
       });
     });

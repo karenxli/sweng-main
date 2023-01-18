@@ -1,11 +1,11 @@
-import { ITiledMapObject } from "@jonbell/tiled-map-type-guard";
-import Player from "../lib/Player";
+import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
+import Player from '../lib/Player';
 import {
   BoundingBox,
   TownEmitter,
   ViewingArea as ViewingAreaModel,
-} from "../types/CoveyTownSocket";
-import InteractableArea from "./InteractableArea";
+} from '../types/CoveyTownSocket';
+import InteractableArea from './InteractableArea';
 
 export default class ViewingArea extends InteractableArea {
   private _video?: string;

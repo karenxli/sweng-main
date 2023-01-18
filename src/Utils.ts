@@ -4,13 +4,14 @@
  *
  * @param _args
  */
-// eslint-disable-next-line
-export function removeThisFunctionCallWhenYouImplementThis(_args1?: any, _args2?: any): Error {
-  return new Error("Unimplemented");
+
+export function removeThisFunctionCallWhenYouImplementThis(
+  _args1?: any,
+  _args2?: any
+): Error {
+  return new Error('Unimplemented');
 }
 
-// eslint-disable-next-line
 export function logError(err: any): void {
-  // eslint-disable-next-line no-console
   console.trace(err);
 }

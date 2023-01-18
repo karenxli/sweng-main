@@ -1,9 +1,9 @@
-import { nanoid } from "nanoid";
+import { nanoid } from 'nanoid';
 import {
   Player as PlayerModel,
   PlayerLocation,
   TownEmitter,
-} from "../types/CoveyTownSocket";
+} from '../types/CoveyTownSocket';
 
 /**
  * Each user who is connected to a town is represented by a Player object
@@ -32,7 +32,7 @@ export default class Player {
       x: 0,
       y: 0,
       moving: false,
-      rotation: "front",
+      rotation: 'front',
     };
     this._userName = userName;
     this._id = nanoid();

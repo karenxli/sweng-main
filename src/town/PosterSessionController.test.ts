@@ -1,19 +1,19 @@
-import { DeepMockProxy, mockDeep } from "jest-mock-extended";
-import { nanoid } from "nanoid";
-import { readFileSync } from "fs";
+import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
+import { nanoid } from 'nanoid';
+import { readFileSync } from 'fs';
 import {
   Interactable,
   TownEmitter,
   PosterSessionArea,
-} from "../types/CoveyTownSocket";
-import TownsStore from "../lib/TownsStore";
+} from '../types/CoveyTownSocket';
+import TownsStore from '../lib/TownsStore';
 import {
   getLastEmittedEvent,
   mockPlayer,
   MockedPlayer,
   isPosterSessionArea,
-} from "../TestUtils";
-import { TownsController } from "./TownsController";
+} from '../TestUtils';
+import { TownsController } from './TownsController';
 
 interface TestTownData {
   friendlyName: string;
@@ -23,7 +23,7 @@ interface TestTownData {
 }
 
 const broadcastEmitter = jest.fn();
-describe("TownsController integration tests", () => {
+describe('TownsController integration tests', () => {
   let controller: TownsController;
 
   const createdTownEmitters: Map<
@@ -37,11 +37,11 @@ describe("TownsController integration tests", () => {
     const friendlyName =
       friendlyNameToUse !== undefined
         ? friendlyNameToUse
-        : `${isPublic ? "Public" : "Private"}TestingTown=${nanoid()}`;
+        : `${isPublic ? 'Public' : 'Private'}TestingTown=${nanoid()}`;
     const ret = await controller.createTown({
       friendlyName,
       isPubliclyListed: isPublic,
-      mapFile: "testData/indoors.json",
+      mapFile: 'testData/indoors.json',
     });
     return {
       friendlyName,
@@ -60,10 +60,10 @@ describe("TownsController integration tests", () => {
 
   beforeAll(() => {
     // Set the twilio tokens to dummy values so that the unit tests can run
-    process.env.TWILIO_API_AUTH_TOKEN = "testing";
-    process.env.TWILIO_ACCOUNT_SID = "ACtesting";
-    process.env.TWILIO_API_KEY_SID = "testing";
-    process.env.TWILIO_API_KEY_SECRET = "testing";
+    process.env.TWILIO_API_AUTH_TOKEN = 'testing';
+    process.env.TWILIO_ACCOUNT_SID = 'ACtesting';
+    process.env.TWILIO_API_KEY_SID = 'testing';
+    process.env.TWILIO_API_KEY_SECRET = 'testing';
   });
 
   beforeEach(async () => {
@@ -77,7 +77,7 @@ describe("TownsController integration tests", () => {
     controller = new TownsController();
   });
 
-  describe("Interactables", () => {
+  describe('Interactables', () => {
     let testingTown: TestTownData;
     let player: MockedPlayer;
     let sessionToken: string;
@@ -86,26 +86,26 @@ describe("TownsController integration tests", () => {
       testingTown = await createTownForTesting(undefined, true);
       player = mockPlayer(testingTown.townID);
       await controller.joinTown(player.socket);
-      const initialData = getLastEmittedEvent(player.socket, "initialize");
+      const initialData = getLastEmittedEvent(player.socket, 'initialize');
       sessionToken = initialData.sessionToken;
       interactables = initialData.interactables;
     });
 
-    describe("Create Poster Session Area", () => {
-      it("Executes without error when creating a new poster session area", async () => {
+    describe('Create Poster Session Area', () => {
+      it('Executes without error when creating a new poster session area', async () => {
         const posterSessionArea = interactables.find(
           isPosterSessionArea
         ) as PosterSessionArea;
         if (!posterSessionArea) {
           fail(
-            "Expected at least one poster session area to be returned in the initial join data"
+            'Expected at least one poster session area to be returned in the initial join data'
           );
         } else {
           const newPosterSessionArea = {
             id: posterSessionArea.id,
             stars: 0,
-            title: "Test title",
-            imageContents: readFileSync("testData/poster.jpg", "utf-8"),
+            title: 'Test title',
+            imageContents: readFileSync('testData/poster.jpg', 'utf-8'),
           };
           await controller.createPosterSessionArea(
             testingTown.townID,
@@ -116,26 +116,26 @@ describe("TownsController integration tests", () => {
           const townEmitter = getBroadcastEmitterForTownID(testingTown.townID);
           const updateMessage = getLastEmittedEvent(
             townEmitter,
-            "interactableUpdate"
+            'interactableUpdate'
           );
           if (isPosterSessionArea(updateMessage)) {
             expect(updateMessage).toEqual(newPosterSessionArea);
           } else {
             fail(
-              "Expected an interactableUpdate to be dispatched with the new poster session area"
+              'Expected an interactableUpdate to be dispatched with the new poster session area'
             );
           }
         }
       });
-      it("Returns an error message if the town ID is invalid", async () => {
+      it('Returns an error message if the town ID is invalid', async () => {
         const posterSessionArea = interactables.find(
           isPosterSessionArea
         ) as PosterSessionArea;
         const newPosterSessionArea = {
           id: posterSessionArea.id,
           stars: 0,
-          title: "Test title",
-          imageContents: readFileSync("testData/poster.jpg", "utf-8"),
+          title: 'Test title',
+          imageContents: readFileSync('testData/poster.jpg', 'utf-8'),
         };
         await expect(
           controller.createPosterSessionArea(
@@ -145,7 +145,7 @@ describe("TownsController integration tests", () => {
           )
         ).rejects.toThrow();
       });
-      it("Checks for a valid session token before creating a poster session area", async () => {
+      it('Checks for a valid session token before creating a poster session area', async () => {
         const invalidSessionToken = nanoid();
         const posterSessionArea = interactables.find(
           isPosterSessionArea
@@ -153,8 +153,8 @@ describe("TownsController integration tests", () => {
         const newPosterSessionArea = {
           id: posterSessionArea.id,
           stars: 0,
-          title: "Test title",
-          imageContents: readFileSync("testData/poster.jpg", "utf-8"),
+          title: 'Test title',
+          imageContents: readFileSync('testData/poster.jpg', 'utf-8'),
         };
         await expect(
           controller.createPosterSessionArea(
@@ -164,7 +164,7 @@ describe("TownsController integration tests", () => {
           )
         ).rejects.toThrow();
       });
-      it("Returns an error message if addPosterSessionArea returns false", async () => {
+      it('Returns an error message if addPosterSessionArea returns false', async () => {
         const posterSessionArea = interactables.find(
           isPosterSessionArea
         ) as PosterSessionArea;
@@ -182,19 +182,19 @@ describe("TownsController integration tests", () => {
           )
         ).rejects.toThrow();
       });
-      it("Cant create a poster session area with no image", async () => {
+      it('Cant create a poster session area with no image', async () => {
         const posterSessionArea = interactables.find(
           isPosterSessionArea
         ) as PosterSessionArea;
         if (!posterSessionArea) {
           fail(
-            "Expected at least one poster session area to be returned in the initial join data"
+            'Expected at least one poster session area to be returned in the initial join data'
           );
         } else {
           const newPosterSessionArea = {
             id: posterSessionArea.id,
             stars: 0,
-            title: "Test title",
+            title: 'Test title',
             // image contents is undefined
           };
           await expect(
@@ -206,19 +206,19 @@ describe("TownsController integration tests", () => {
           ).rejects.toThrow();
         }
       });
-      it("Cant create a poster session area with no title", async () => {
+      it('Cant create a poster session area with no title', async () => {
         const posterSessionArea = interactables.find(
           isPosterSessionArea
         ) as PosterSessionArea;
         if (!posterSessionArea) {
           fail(
-            "Expected at least one poster session area to be returned in the initial join data"
+            'Expected at least one poster session area to be returned in the initial join data'
           );
         } else {
           const newPosterSessionArea = {
             id: posterSessionArea.id,
             stars: 0,
-            imageContents: readFileSync("testData/poster.jpg", "utf-8"),
+            imageContents: readFileSync('testData/poster.jpg', 'utf-8'),
             // title is undefined
           };
           await expect(
@@ -231,22 +231,22 @@ describe("TownsController integration tests", () => {
         }
       });
     });
-    describe("Interact with existing Poster Session Area", () => {
+    describe('Interact with existing Poster Session Area', () => {
       // testing in progress
-      it("Increments number of stars on a poster session area", async () => {
+      it('Increments number of stars on a poster session area', async () => {
         const posterSessionArea = interactables.find(
           isPosterSessionArea
         ) as PosterSessionArea;
         if (!posterSessionArea) {
           fail(
-            "Expected at least one poster session area to be returned in the initial join data"
+            'Expected at least one poster session area to be returned in the initial join data'
           );
         } else {
           const newPosterSessionArea = {
             id: posterSessionArea.id,
             stars: 0,
-            title: "Test title",
-            imageContents: readFileSync("testData/poster.jpg", "utf-8"),
+            title: 'Test title',
+            imageContents: readFileSync('testData/poster.jpg', 'utf-8'),
           };
           await controller.createPosterSessionArea(
             testingTown.townID,
@@ -261,20 +261,20 @@ describe("TownsController integration tests", () => {
           expect(numStars).toEqual(newPosterSessionArea.stars + 1);
         }
       });
-      it("Gets the image contents of a poster session area", async () => {
+      it('Gets the image contents of a poster session area', async () => {
         const posterSessionArea = interactables.find(
           isPosterSessionArea
         ) as PosterSessionArea;
         if (!posterSessionArea) {
           fail(
-            "Expected at least one poster session area to be returned in the initial join data"
+            'Expected at least one poster session area to be returned in the initial join data'
           );
         } else {
           const newPosterSessionArea = {
             id: posterSessionArea.id,
             stars: 0,
-            title: "Test title",
-            imageContents: readFileSync("testData/poster.jpg", "utf-8"),
+            title: 'Test title',
+            imageContents: readFileSync('testData/poster.jpg', 'utf-8'),
           };
           await controller.createPosterSessionArea(
             testingTown.townID,

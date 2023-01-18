@@ -1,11 +1,11 @@
-import { ITiledMapObject } from "@jonbell/tiled-map-type-guard";
-import Player from "../lib/Player";
+import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
+import Player from '../lib/Player';
 import {
   BoundingBox,
   ConversationArea as ConversationAreaModel,
   TownEmitter,
-} from "../types/CoveyTownSocket";
-import InteractableArea from "./InteractableArea";
+} from '../types/CoveyTownSocket';
+import InteractableArea from './InteractableArea';
 
 export default class ConversationArea extends InteractableArea {
   /* The topic of the conversation area, or undefined if it is not set */

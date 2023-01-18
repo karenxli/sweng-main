@@ -1,9 +1,9 @@
-import { ITiledMap, ITiledMapObjectLayer } from "@jonbell/tiled-map-type-guard";
-import { nanoid } from "nanoid";
-import { BroadcastOperator } from "socket.io";
-import IVideoClient from "../lib/IVideoClient";
-import Player from "../lib/Player";
-import TwilioVideo from "../lib/TwilioVideo";
+import { ITiledMap, ITiledMapObjectLayer } from '@jonbell/tiled-map-type-guard';
+import { nanoid } from 'nanoid';
+import { BroadcastOperator } from 'socket.io';
+import IVideoClient from '../lib/IVideoClient';
+import Player from '../lib/Player';
+import TwilioVideo from '../lib/TwilioVideo';
 import {
   ChatMessage,
   ConversationArea as ConversationAreaModel,
@@ -14,11 +14,11 @@ import {
   SocketData,
   ViewingArea as ViewingAreaModel,
   PosterSessionArea as PosterSessionAreaModel,
-} from "../types/CoveyTownSocket";
-import ConversationArea from "./ConversationArea";
-import InteractableArea from "./InteractableArea";
-import ViewingArea from "./ViewingArea";
-import PosterSessionArea from "./PosterSessionArea";
+} from '../types/CoveyTownSocket';
+import ConversationArea from './ConversationArea';
+import InteractableArea from './InteractableArea';
+import ViewingArea from './ViewingArea';
+import PosterSessionArea from './PosterSessionArea';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -31,7 +31,7 @@ export default class Town {
 
   set isPubliclyListed(value: boolean) {
     this._isPubliclyListed = value;
-    this._broadcastEmitter.emit("townSettingsUpdated", {
+    this._broadcastEmitter.emit('townSettingsUpdated', {
       isPubliclyListed: value,
     });
   }
@@ -58,7 +58,7 @@ export default class Town {
 
   set friendlyName(value: string) {
     this._friendlyName = value;
-    this._broadcastEmitter.emit("townSettingsUpdated", { friendlyName: value });
+    this._broadcastEmitter.emit('townSettingsUpdated', { friendlyName: value });
   }
 
   get townID(): string {
@@ -130,12 +130,12 @@ export default class Town {
     );
 
     // Notify other players that this player has joined
-    this._broadcastEmitter.emit("playerJoined", newPlayer.toPlayerModel());
+    this._broadcastEmitter.emit('playerJoined', newPlayer.toPlayerModel());
 
     // Register an event listener for the client socket: if the client disconnects,
     // clean up our listener adapter, and then let the CoveyTownController know that the
     // player's session is disconnected
-    socket.on("disconnect", () => {
+    socket.on('disconnect', () => {
       this._removePlayer(newPlayer);
       this._connectedSockets.delete(socket);
     });
@@ -143,11 +143,11 @@ export default class Town {
     // PART 1
     // Set up a listener to forward all chat messages to all clients in the same interactableArea as the player,
     // and only if the message has the same interactable id as the player
-    socket.on("chatMessage", (message: ChatMessage) => {});
+    socket.on('chatMessage', (message: ChatMessage) => {});
 
     // Register an event listener for the client socket: if the client updates their
     // location, inform the CoveyTownController
-    socket.on("playerMovement", (movementData: PlayerLocation) => {
+    socket.on('playerMovement', (movementData: PlayerLocation) => {
       this._updatePlayerLocation(newPlayer, movementData);
     });
 
@@ -159,7 +159,7 @@ export default class Town {
     // the interactableUpdate to the other players in the town. Also dispatches an
     // updateModel call to the viewingArea or posterSessionArea that corresponds to the interactable being
     // updated. Does not throw an error if the specified viewing area or poster session area does not exist.
-    socket.on("interactableUpdate", (update: Interactable): Player | void => {
+    socket.on('interactableUpdate', (update: Interactable): Player | void => {
       const changedInteractable = this._interactables.find(
         (interactable) => interactable.id === update.id
       ) as PosterSessionArea & ViewingArea;
@@ -170,7 +170,7 @@ export default class Town {
         update as PosterSessionArea & ViewingArea
       );
 
-      newPlayer.townEmitter.emit("interactableUpdate", update);
+      newPlayer.townEmitter.emit('interactableUpdate', update);
     });
     return newPlayer;
   }
@@ -185,7 +185,7 @@ export default class Town {
       this._removePlayerFromInteractable(player);
     }
     this._players = this._players.filter((p) => p.id !== player.id);
-    this._broadcastEmitter.emit("playerDisconnect", player.toPlayerModel());
+    this._broadcastEmitter.emit('playerDisconnect', player.toPlayerModel());
   }
 
   /**
@@ -224,7 +224,7 @@ export default class Town {
 
     player.location = location;
 
-    this._broadcastEmitter.emit("playerMoved", player.toPlayerModel());
+    this._broadcastEmitter.emit('playerMoved', player.toPlayerModel());
   }
 
   /**
@@ -268,7 +268,7 @@ export default class Town {
     }
     area.topic = conversationArea.topic;
     area.addPlayersWithinBounds(this._players);
-    this._broadcastEmitter.emit("interactableUpdate", area.toModel());
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;
   }
 
@@ -298,7 +298,7 @@ export default class Town {
     }
     area.updateModel(viewingArea);
     area.addPlayersWithinBounds(this._players);
-    this._broadcastEmitter.emit("interactableUpdate", area.toModel());
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;
   }
 
@@ -336,7 +336,7 @@ export default class Town {
     }
     area.updateModel(posterSessionArea);
     area.addPlayersWithinBounds(this._players);
-    this._broadcastEmitter.emit("interactableUpdate", area.toModel());
+    this._broadcastEmitter.emit('interactableUpdate', area.toModel());
     return true;
   }
 
@@ -372,7 +372,7 @@ export default class Town {
    * disconnects all players.
    */
   public disconnectAllPlayers(): void {
-    this._broadcastEmitter.emit("townClosing");
+    this._broadcastEmitter.emit('townClosing');
     this._connectedSockets.forEach((eachSocket) => eachSocket.disconnect(true));
   }
 
@@ -394,24 +394,24 @@ export default class Town {
    */
   public initializeFromMap(map: ITiledMap) {
     const objectLayer = map.layers.find(
-      (eachLayer) => eachLayer.name === "Objects"
+      (eachLayer) => eachLayer.name === 'Objects'
     ) as ITiledMapObjectLayer;
     if (!objectLayer) {
-      throw new Error("Unable to find objects layer in map");
+      throw new Error('Unable to find objects layer in map');
     }
     const viewingAreas = objectLayer.objects
-      .filter((eachObject) => eachObject.type === "ViewingArea")
+      .filter((eachObject) => eachObject.type === 'ViewingArea')
       .map((eachViewingAreaObject) =>
         ViewingArea.fromMapObject(eachViewingAreaObject, this._broadcastEmitter)
       );
 
     const conversationAreas = objectLayer.objects
-      .filter((eachObject) => eachObject.type === "ConversationArea")
+      .filter((eachObject) => eachObject.type === 'ConversationArea')
       .map((eachConvAreaObj) =>
         ConversationArea.fromMapObject(eachConvAreaObj, this._broadcastEmitter)
       );
     const posterSessionAreas = objectLayer.objects
-      .filter((eachObject) => eachObject.type === "PosterSessionArea")
+      .filter((eachObject) => eachObject.type === 'PosterSessionArea')
       .map((eachPSAreaObj) =>
         PosterSessionArea.fromMapObject(eachPSAreaObj, this._broadcastEmitter)
       );

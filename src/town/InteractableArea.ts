@@ -1,10 +1,10 @@
-import Player from "../lib/Player";
+import Player from '../lib/Player';
 import {
   BoundingBox,
   Interactable,
   PlayerLocation,
   TownEmitter,
-} from "../types/CoveyTownSocket";
+} from '../types/CoveyTownSocket';
 
 export const PLAYER_SPRITE_WIDTH = 32;
 export const PLAYER_SPRITE_HEIGHT = 64;
@@ -79,7 +79,7 @@ export default abstract class InteractableArea {
   public add(player: Player): void {
     this._occupants.push(player);
     player.location.interactableID = this.id;
-    this._townEmitter.emit("playerMoved", player.toPlayerModel());
+    this._townEmitter.emit('playerMoved', player.toPlayerModel());
     this._emitAreaChanged();
   }
 
@@ -98,7 +98,7 @@ export default abstract class InteractableArea {
       (eachPlayer) => eachPlayer !== player
     );
     player.location.interactableID = undefined;
-    this._townEmitter.emit("playerMoved", player.toPlayerModel());
+    this._townEmitter.emit('playerMoved', player.toPlayerModel());
     this._emitAreaChanged();
   }
 
@@ -167,7 +167,7 @@ export default abstract class InteractableArea {
    * the model for this InteractableArea in that event.
    */
   protected _emitAreaChanged() {
-    this._townEmitter.emit("interactableUpdate", this.toModel());
+    this._townEmitter.emit('interactableUpdate', this.toModel());
   }
 
   /**

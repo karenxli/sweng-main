@@ -1,4 +1,4 @@
-import { BroadcastOperator, Socket } from "socket.io";
+import { BroadcastOperator, Socket } from 'socket.io';
 // import InteractableArea from "../town/InteractableArea";
 
 export interface TownJoinResponse {
@@ -27,7 +27,7 @@ export interface TownSettingsUpdate {
   isPubliclyListed?: boolean;
 }
 
-export type Direction = "front" | "back" | "left" | "right";
+export type Direction = 'front' | 'back' | 'left' | 'right';
 export interface Player {
   id: string;
   userName: string;

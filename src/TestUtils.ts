@@ -1,16 +1,16 @@
-import { BroadcastOperator } from "socket.io";
+import { BroadcastOperator } from 'socket.io';
 
-import { mock, mockDeep, MockProxy } from "jest-mock-extended";
-import { nanoid } from "nanoid";
-import { SocketReservedEventsMap } from "socket.io/dist/socket";
+import { mock, mockDeep, MockProxy } from 'jest-mock-extended';
+import { nanoid } from 'nanoid';
+import { SocketReservedEventsMap } from 'socket.io/dist/socket';
 import {
   EventNames,
   EventParams,
   ReservedOrUserEventNames,
   ReservedOrUserListener,
   TypedEventBroadcaster,
-} from "socket.io/dist/typed-events";
-import Player from "./lib/Player";
+} from 'socket.io/dist/typed-events';
+import Player from './lib/Player';
 import {
   BoundingBox,
   ClientToServerEvents,
@@ -23,7 +23,7 @@ import {
   ServerToClientEvents,
   SocketData,
   ViewingArea,
-} from "./types/CoveyTownSocket";
+} from './types/CoveyTownSocket';
 
 /**
  * Create a new conversation area using some random defaults
@@ -47,7 +47,7 @@ export function defaultLocation(): PlayerLocation {
     x: 0,
     y: 0,
     moving: false,
-    rotation: "front",
+    rotation: 'front',
     interactableID: undefined,
   };
 }
@@ -110,7 +110,7 @@ export function getLastEmittedEvent<
  * @returns
  */
 export function extractSessionToken(player: MockedPlayer): string {
-  return getLastEmittedEvent(player.socket, "initialize").sessionToken;
+  return getLastEmittedEvent(player.socket, 'initialize').sessionToken;
 }
 
 /**
@@ -173,10 +173,10 @@ export class MockedPlayer {
   moveTo(
     x: number,
     y: number,
-    rotation: Direction = "front",
+    rotation: Direction = 'front',
     moving = false
   ): void {
-    const onMovementListener = getEventListener(this.socket, "playerMovement");
+    const onMovementListener = getEventListener(this.socket, 'playerMovement');
     onMovementListener({ x, y, rotation, moving });
   }
 }
@@ -229,17 +229,17 @@ export function expectArraysToContainSameMembers<T>(
 export function isViewingArea(
   interactable: Interactable
 ): interactable is ViewingArea {
-  return "isPlaying" in interactable;
+  return 'isPlaying' in interactable;
 }
 
 export function isConversationArea(
   interactable: Interactable
 ): interactable is ConversationArea {
-  return "topic" in interactable;
+  return 'topic' in interactable;
 }
 
 export function isPosterSessionArea(
   interactable: Interactable
 ): interactable is PosterSessionArea {
-  return "stars" in interactable;
+  return 'stars' in interactable;
 }

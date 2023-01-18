@@ -1,12 +1,11 @@
-import { ITiledMapObject } from "@jonbell/tiled-map-type-guard";
-import e from "express";
-import Player from "../lib/Player";
+import { ITiledMapObject } from '@jonbell/tiled-map-type-guard';
+import Player from '../lib/Player';
 import {
   BoundingBox,
   TownEmitter,
   PosterSessionArea as PosterSessionAreaModel,
-} from "../types/CoveyTownSocket";
-import InteractableArea from "./InteractableArea";
+} from '../types/CoveyTownSocket';
+import InteractableArea from './InteractableArea';
 
 export default class PosterSessionArea extends InteractableArea {
   // add fields
@@ -52,7 +51,7 @@ export default class PosterSessionArea extends InteractableArea {
     // fill in
     this._poster = imageContents;
     if (stars < 0) {
-      throw new Error("Invalid number of stars!");
+      throw new Error('Invalid number of stars!');
     } else this._stars = stars;
     this._title = title;
     this._coordinates = coordinates;

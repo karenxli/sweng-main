@@ -1,8 +1,8 @@
-import { ITiledMap } from "@jonbell/tiled-map-type-guard";
-import * as fs from "fs/promises";
-import { customAlphabet } from "nanoid";
-import Town from "../town/Town";
-import { TownEmitterFactory } from "../types/CoveyTownSocket";
+import { ITiledMap } from '@jonbell/tiled-map-type-guard';
+import * as fs from 'fs/promises';
+import { customAlphabet } from 'nanoid';
+import Town from '../town/Town';
+import { TownEmitterFactory } from '../types/CoveyTownSocket';
 
 function passwordMatches(provided: string, expected: string): boolean {
   if (provided === expected) {
@@ -17,7 +17,7 @@ function passwordMatches(provided: string, expected: string): boolean {
   return false;
 }
 
-const friendlyNanoID = customAlphabet("1234567890ABCDEF", 8);
+const friendlyNanoID = customAlphabet('1234567890ABCDEF', 8);
 
 export type TownList = Array<{
   friendlyName: string;
@@ -45,7 +45,7 @@ export default class TownsStore {
   static getInstance(): TownsStore {
     if (TownsStore._instance === undefined) {
       throw new Error(
-        "TownsStore must be initialized before getInstance is called"
+        'TownsStore must be initialized before getInstance is called'
       );
     }
     return TownsStore._instance;
@@ -88,10 +88,10 @@ export default class TownsStore {
   async createTown(
     friendlyName: string,
     isPubliclyListed: boolean,
-    mapFile = "../frontend/public/assets/tilemaps/indoors.json"
+    mapFile = '../frontend/public/assets/tilemaps/indoors.json'
   ): Promise<Town> {
     if (friendlyName.length === 0) {
-      throw new Error("FriendlyName must be specified");
+      throw new Error('FriendlyName must be specified');
     }
     const townID =
       process.env.DEMO_TOWN_ID === friendlyName
@@ -103,7 +103,7 @@ export default class TownsStore {
       townID,
       this._emitterFactory(townID)
     );
-    const data = JSON.parse(await fs.readFile(mapFile, "utf-8"));
+    const data = JSON.parse(await fs.readFile(mapFile, 'utf-8'));
     const map = ITiledMap.parse(data);
     newTown.initializeFromMap(map);
     this._towns.push(newTown);

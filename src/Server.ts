@@ -1,19 +1,19 @@
-import Express from "express";
-import * as http from "http";
-import CORS from "cors";
-import { AddressInfo } from "net";
-import swaggerUi from "swagger-ui-express";
-import { ValidateError } from "tsoa";
-import fs from "fs/promises";
-import { Server as SocketServer } from "socket.io";
-import { RegisterRoutes } from "../generated/routes";
-import TownsStore from "./lib/TownsStore";
+import Express from 'express';
+import * as http from 'http';
+import CORS from 'cors';
+import { AddressInfo } from 'net';
+import swaggerUi from 'swagger-ui-express';
+import { ValidateError } from 'tsoa';
+import fs from 'fs/promises';
+import { Server as SocketServer } from 'socket.io';
+import { RegisterRoutes } from '../generated/routes';
+import TownsStore from './lib/TownsStore';
 import {
   ClientToServerEvents,
   ServerToClientEvents,
-} from "./types/CoveyTownSocket";
-import { TownsController } from "./town/TownsController";
-import { logError } from "./Utils";
+} from './types/CoveyTownSocket';
+import { TownsController } from './town/TownsController';
+import { logError } from './Utils';
 
 // Create the server instances
 const app = Express();
@@ -23,7 +23,7 @@ const socketServer = new SocketServer<
   ClientToServerEvents,
   ServerToClientEvents
 >(server, {
-  cors: { origin: "*" },
+  cors: { origin: '*' },
 });
 
 // Initialize the towns store with a factory that creates a broadcast emitter for a town
@@ -31,7 +31,7 @@ TownsStore.initializeTownsStore((townID: string) => socketServer.to(townID));
 
 // Connect the socket server to the TownsController. We use here the same pattern as tsoa
 // (the library that we use for REST), which creates a new controller instance for each request
-socketServer.on("connection", (socket) => {
+socketServer.on('connection', (socket) => {
   new TownsController().joinTown(socket);
 });
 
@@ -40,12 +40,12 @@ app.use(Express.json());
 
 // Add a /docs endpoint that will display swagger auto-generated documentation
 app.use(
-  "/docs",
+  '/docs',
   swaggerUi.serve,
   async (_req: Express.Request, res: Express.Response) => {
     const swaggerSpec = await fs.readFile(
-      "../shared/generated/swagger.json",
-      "utf-8"
+      '../shared/generated/swagger.json',
+      'utf-8'
     );
     return res.send(swaggerUi.generateHTML(JSON.parse(swaggerSpec)));
   }
@@ -64,14 +64,14 @@ app.use(
   ): Express.Response | void => {
     if (err instanceof ValidateError) {
       return res.status(422).json({
-        message: "Validation Failed",
+        message: 'Validation Failed',
         details: err?.fields,
       });
     }
     if (err instanceof Error) {
       logError(err);
       return res.status(500).json({
-        message: "Internal Server Error",
+        message: 'Internal Server Error',
       });
     }
 

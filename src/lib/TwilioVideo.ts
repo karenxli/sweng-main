@@ -1,7 +1,7 @@
-import dotenv from "dotenv";
-import Twilio from "twilio";
-import { logError } from "../Utils";
-import IVideoClient from "./IVideoClient";
+import dotenv from 'dotenv';
+import Twilio from 'twilio';
+import { logError } from '../Utils';
+import IVideoClient from './IVideoClient';
 
 dotenv.config();
 
@@ -13,7 +13,7 @@ declare global {
   }
 }
 
-const MISSING_TOKEN_NAME = "missing";
+const MISSING_TOKEN_NAME = 'missing';
 export default class TwilioVideo implements IVideoClient {
   private static _instance: TwilioVideo;
 
@@ -54,7 +54,7 @@ export default class TwilioVideo implements IVideoClient {
       this._twilioApiKeySecret === MISSING_TOKEN_NAME
     ) {
       logError(
-        "Twilio tokens missing. Video chat will be disabled, and viewing areas will not work. Please be sure to configure the variables in the townService .env file as described in the README"
+        'Twilio tokens missing. Video chat will be disabled, and viewing areas will not work. Please be sure to configure the variables in the townService .env file as described in the README'
       );
       return MISSING_TOKEN_NAME;
     }
