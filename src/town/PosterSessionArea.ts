@@ -17,7 +17,6 @@ export default class PosterSessionArea extends InteractableArea {
 
   private _coordinates: BoundingBox;
   /* An emitter that can be used to broadcast messages to all players in this town */
-  private _townEmitter: TownEmitter;
 
 
   public get stars() {
@@ -30,6 +29,10 @@ export default class PosterSessionArea extends InteractableArea {
 
   public get imageContents() {
     return this._poster;
+  }
+
+  public get coordinates() {
+    return this._coordinates;
   }
 
   /**
@@ -55,7 +58,6 @@ export default class PosterSessionArea extends InteractableArea {
     else this._stars = stars;
     this._title = title;
     this._coordinates = coordinates;
-    this._townEmitter = townEmitter;
   }
 
   /**
@@ -75,6 +77,12 @@ export default class PosterSessionArea extends InteractableArea {
     }
   }
 
+  /**
+   * Increments the number of stars in a poster session area by 1.
+   */
+  public incrementStars(): void {
+    this._stars += 1;
+  }
   /**
    * Updates the state of this PosterSessionArea, setting the poster, title, and stars properties
    *

@@ -2,7 +2,7 @@ import assert from 'assert';
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import { Town } from '../api/Model';
-import { ConversationArea, Interactable, TownEmitter, ViewingArea } from '../types/CoveyTownSocket';
+import { ConversationArea, Interactable, TownEmitter, ViewingArea, PosterSessionArea } from '../types/CoveyTownSocket';
 import TownsStore from '../lib/TownsStore';
 import {
   createConversationForTesting,
@@ -12,8 +12,10 @@ import {
   isViewingArea,
   isConversationArea,
   MockedPlayer,
+  isPosterSessionArea,
 } from '../TestUtils';
 import { TownsController } from './TownsController';
+// import PosterSessionArea from './PosterSessionArea';
 
 type TestTownData = {
   friendlyName: string;
@@ -356,5 +358,110 @@ describe('TownsController integration tests', () => {
         ).rejects.toThrow();
       });
     });
+
+    describe('[T2] Create Poster Session Area', () => {
+      it('Executes without error when creating a new poster area', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+        if (!posterArea) {
+          fail('Expected at least one poster area to be returned in the initial join data');
+        } else {
+          const newPosterArea: PosterSessionArea = {
+            id: posterArea.id,
+            stars: 0,
+            imageContents: "sss",
+            title: nanoid(),
+          };
+          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
+          // Check to see that the viewing area was successfully updated
+          const townEmitter = getBroadcastEmitterForTownID(testingTown.townID);
+          const updateMessage = getLastEmittedEvent(townEmitter, 'interactableUpdate');
+          if (isPosterSessionArea(updateMessage)) {
+            expect(updateMessage).toEqual(newPosterArea);
+          } else {
+            fail('Expected an interactableUpdate to be dispatched with the new poster area');
+          }
+        }
+      });
+      it('Returns an error message if the town ID is invalid', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+        const newPosterArea: PosterSessionArea = {
+          id: posterArea.id,
+          stars: 0,
+          imageContents: "sss",
+          title: nanoid(),
+        };
+        await expect(
+          controller.createPosterSessionArea(nanoid(), sessionToken, newPosterArea),
+        ).rejects.toThrow();
+      });
+      it('Checks for a valid session token before creating a poster area', async () => {
+        const invalidSessionToken = nanoid();
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+        const newPosterArea: PosterSessionArea = {
+          id: posterArea.id,
+          stars: 0,
+          imageContents: "sss",
+          title: nanoid(),
+        };
+        await expect(
+          controller.createPosterSessionArea(nanoid(), invalidSessionToken, newPosterArea),
+        ).rejects.toThrow();
+      });
+      it('Returns an error message if addPosterArea returns false', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+        posterArea.id = nanoid();
+        await expect(
+          controller.createPosterSessionArea(testingTown.townID, sessionToken, posterArea),
+        ).rejects.toThrow();
+      });
+    });
+    describe('[T3] Get Poster Image Contents', () => {
+      it('Executes without error when creating a new poster area', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+        if (!posterArea) {
+          fail('Expected at least one poster area to be returned in the initial join data');
+        } else {
+          const newPosterArea: PosterSessionArea = {
+            id: posterArea.id,
+            stars: 0,
+            imageContents: "sss",
+            title: nanoid(),
+          };
+          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
+          // Check to see that the viewing area was successfully updated
+          const townEmitter = getBroadcastEmitterForTownID(testingTown.townID);
+          const updateMessage = getLastEmittedEvent(townEmitter, 'interactableUpdate');
+          if (isPosterSessionArea(updateMessage)) {
+            expect(updateMessage).toEqual(newPosterArea);
+          } else {
+            fail('Expected an interactableUpdate to be dispatched with the new poster area');
+          }
+        }
+      });
+      // this stays the same
+      it('Returns an error message if the town ID is invalid', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+        await expect(
+          controller.getPosterAreaImageContents(nanoid(), posterArea.id, sessionToken),
+        ).rejects.toThrow();
+      });
+      it('Checks for a valid session token before fetching the poster contents', async () => {
+        const invalidSessionToken = nanoid();
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+
+        await expect(
+          controller.getPosterAreaImageContents(nanoid(), posterArea.id, invalidSessionToken),
+        ).rejects.toThrow();
+      });
+      it('Returns an error message if addPosterArea returns false', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+        posterArea.id = nanoid();
+        await expect(
+          controller.createPosterSessionArea(testingTown.townID, sessionToken, posterArea),
+        ).rejects.toThrow();
+      });
+    });
+    // work on this next
   });
 });
+

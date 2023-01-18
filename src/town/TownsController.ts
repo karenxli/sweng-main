@@ -163,7 +163,7 @@ export class TownsController extends Controller {
       throw new InvalidParametersError('Invalid values specified');
     }
   }
-  // FILL IN
+  // FILL IN - finished, not tested
   /**
    * Creates a poster session area in a given town
    *
@@ -195,6 +195,7 @@ export class TownsController extends Controller {
     }
   }
 
+  // FILL IN - finished, not tested
   /**
    * Gets the image contents of a given poster session area in a given town
    *
@@ -213,9 +214,21 @@ export class TownsController extends Controller {
     @Path() posterSessionId: string,
     @Header('X-Session-Token') sessionToken: string,
   ): Promise<string | undefined> {
-    throw new Error('Not implemented');
+    const town = this._townsStore.getTownByID(townID);
+    if (!town) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+    if (!town?.getPlayerBySessionToken(sessionToken)) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+    const foundPoster = town.getInteractable(posterSessionId);
+    if(!foundPoster || !(isPosterSessionArea(foundPoster))) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+    else return foundPoster.imageContents
   }
 
+  // FILL IN - finished, not tested
   /**
    * Increment the stars of a given poster session area in a given town, as long as there is
    * a poster image. Returns the new number of stars.
@@ -236,7 +249,22 @@ export class TownsController extends Controller {
     @Path() posterSessionId: string,
     @Header('X-Session-Token') sessionToken: string,
   ): Promise<number> {
-    throw new Error('Not implemented');
+    const town = this._townsStore.getTownByID(townID);
+    if (!town) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+    if (!town?.getPlayerBySessionToken(sessionToken)) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+    const posterContents = this.getPosterAreaImageContents(townID, posterSessionId, sessionToken);
+    if(!posterContents) {
+      throw new InvalidParametersError('Invalid values specified');
+    }
+    else {
+      const foundPoster = town.getInteractable(posterSessionId) as unknown as PosterSessionArea;
+      foundPoster.incrementStars();
+      return foundPoster.stars;
+    }
   }
 
   /**

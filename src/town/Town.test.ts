@@ -18,6 +18,7 @@ import {
   PlayerLocation,
   TownEmitter,
   ViewingArea as ViewingAreaModel,
+  PosterSessionArea as PosterSessionAreaModel
 } from '../types/CoveyTownSocket';
 import ConversationArea from './ConversationArea';
 import Town from './Town';
@@ -326,6 +327,94 @@ const testingMaps: TestMapDict = {
                 name: 'video',
                 type: 'string',
                 value: 'someURL',
+              },
+            ],
+            rotation: 0,
+            visible: true,
+            width: 326,
+            x: 600,
+            y: 1200,
+          },
+        ],
+        opacity: 1,
+        type: 'objectgroup',
+        visible: true,
+        x: 0,
+        y: 0,
+      },
+    ],
+  },
+  twoConvTwoPoster: {
+    tiledversion: '1.9.0',
+    tileheight: 32,
+    tilesets: [],
+    tilewidth: 32,
+    type: 'map',
+    layers: [
+      {
+        id: 4,
+        name: 'Objects',
+        objects: [
+          {
+            type: 'ConversationArea',
+            height: 237,
+            id: 39,
+            name: 'Name1',
+            rotation: 0,
+            visible: true,
+            width: 326,
+            x: 40,
+            y: 120,
+          },
+          {
+            type: 'ConversationArea',
+            height: 266,
+            id: 43,
+            name: 'Name2',
+            rotation: 0,
+            visible: true,
+            width: 467,
+            x: 612,
+            y: 120,
+          },
+          {
+            type: 'PosterSessionArea',
+            height: 237,
+            id: 54,
+            name: 'Name3',
+            properties: [
+              {
+                name: 'title',
+                type: 'string',
+                value: 'somename',
+              },
+              {
+                name: 'imageContents',
+                type: 'string',
+                value: 'somename',
+              },
+            ],
+            rotation: 0,
+            visible: true,
+            width: 326,
+            x: 155,
+            y: 566,
+          },
+          {
+            type: 'PosterSessionArea',
+            height: 237,
+            id: 55,
+            name: 'Name4',
+            properties: [
+              {
+                name: 'title',
+                type: 'string',
+                value: 'somename',
+              },
+              {
+                name: 'imageContents',
+                type: 'string',
+                value: 'somename',
               },
             ],
             rotation: 0,
@@ -703,6 +792,66 @@ describe('Town', () => {
     });
   });
 
+  describe('[T1] addPosterSessionArea', () => {
+    beforeEach(async () => {
+      town.initializeFromMap(testingMaps.twoConvTwoPoster);
+    });
+    it('Should return false if no area exists with that ID', () => {
+      expect(
+        town.addPosterSessionArea({ id: nanoid(), stars: 0, imageContents: nanoid(), title: nanoid() }),
+      ).toBe(false);
+    });
+    it('Should return false if the requested title is empty', () => {
+      expect(
+        town.addPosterSessionArea({ id: 'Name3', stars: 0, imageContents: 'abcde.png', title: ''}),
+      ).toBe(false);
+      expect(
+        town.addPosterSessionArea({ id: 'Name3', stars: 0, imageContents: 'abcde.png', title: undefined}),
+      ).toBe(false);
+    });
+    it('Should return false if the requested poster is empty', () => {
+      expect(
+        town.addPosterSessionArea({ id: 'Name3', stars: 0, imageContents: '', title: 'hello there'}),
+      ).toBe(false);
+      expect(
+        town.addPosterSessionArea({ id: 'Name3', stars: 0, imageContents: undefined, title: 'boo!'}),
+      ).toBe(false);
+    });
+    it('Should return false if the area is already active', () => {
+      expect(
+        town.addPosterSessionArea({ id: 'Name3', stars: 0, imageContents: 'help me obiwan', title: 'hello there'}),
+      ).toBe(true);
+      expect(
+        town.addPosterSessionArea({ id: 'Name3', stars: 0, imageContents: 'youre my only hope', title: 'hello there2'}),
+      ).toBe(false);
+    });
+    describe('When successful', () => {
+      const newModel: PosterSessionAreaModel = {
+        id: 'Name3',
+        stars: 5,
+        imageContents: 'according to',
+        title: 'all laws of aviation'
+      };
+      beforeEach(() => {
+        playerTestData.moveTo(160, 570); // Inside of "Name7" area
+        expect(town.addPosterSessionArea(newModel)).toBe(true);
+      });
+
+      it('Should update the local model for that area', () => {
+        const posterArea = town.getInteractable('Name3');
+        expect(posterArea.toModel()).toEqual(newModel);
+      });
+
+      it('Should emit an interactableUpdate message', () => {
+        const lastEmittedUpdate = getLastEmittedEvent(townEmitter, 'interactableUpdate');
+        expect(lastEmittedUpdate).toEqual(newModel);
+      });
+      it('Should include any players in that area as occupants', () => {
+        const posterArea = town.getInteractable('Name3');
+        expect(posterArea.occupantsByID).toEqual([player.id]);
+      });
+    });
+  });
   describe('disconnectAllPlayers', () => {
     beforeEach(() => {
       town.disconnectAllPlayers();

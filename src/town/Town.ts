@@ -149,6 +149,7 @@ export default class Town {
       this._updatePlayerLocation(newPlayer, movementData);
     });
 
+    // PART 3
     // Set up a listener to process updates to interactables.
     // Currently only knows how to process updates for ViewingAreas and PosterSessionAreas, and
     // ignores any other updates for any other kind of interactable.
@@ -156,8 +157,15 @@ export default class Town {
     // the interactableUpdate to the other players in the town. Also dispatches an
     // updateModel call to the viewingArea or posterSessionArea that corresponds to the interactable being
     // updated. Does not throw an error if the specified viewing area or poster session area does not exist.
-    socket.on('interactableUpdate', (update: Interactable) => {
-      // fill in
+    socket.on('interactableUpdate', (update: Interactable) : void | Player => {
+      const changedInteractable = this._interactables.find(interactable => interactable.id === update.id) as PosterSessionArea & ViewingArea;
+      if(!changedInteractable) {
+        return undefined
+      }
+      else {
+        changedInteractable.updateModel(update as PosterSessionArea & ViewingArea);
+      }
+      newPlayer.townEmitter.emit('interactableUpdate', update);
     });
     return newPlayer;
   }
@@ -278,6 +286,7 @@ export default class Town {
       eachArea => eachArea.id === viewingArea.id,
     ) as ViewingArea;
     if (!area || !viewingArea.video || area.video) {
+      
       return false;
     }
     area.updateModel(viewingArea);
@@ -305,34 +314,11 @@ export default class Town {
    * with the specified ID or if there is no poster image and title specified
    */
   public addPosterSessionArea(posterSessionArea: PosterSessionAreaModel): boolean {
-    /** 
-    const posterIds = <PosterSessionArea[]><unknown>this._interactables;
     
-    const match = posterIds.find(PosterSessionArea => PosterSessionArea.id === posterSessionArea.id);
-    // poster session area with the specified ID
-    if(match === undefined) {
-      return false;
-    }
-    else {
-      if(match?.isActive || match.title === undefined && match.imageContents === undefined) {
-        return false;
-      }
-      else {
-        // create the poster 
-        const newId = posterSessionArea.id;
-        const newImage = posterSessionArea.imageContents;
-        const newStars = posterSessionArea.stars;
-        const newTitle = posterSessionArea.title;
-
-        const newPoster = new PosterSessionAreaModel(newId, newStars, newImage, newTitle);
-        return true;
-      }
-    }*/
-
     const area = this._interactables.find(
       eachArea => eachArea.id === posterSessionArea.id
-    ) as unknown as PosterSessionArea;
-    if (!area || area.title === undefined || !area.imageContents === undefined) {
+    ) as PosterSessionArea;
+    if (!area || !posterSessionArea.title || !posterSessionArea.imageContents || area.title) {
       return false;
     }
     area.updateModel(posterSessionArea);
