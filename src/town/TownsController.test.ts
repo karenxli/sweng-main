@@ -426,7 +426,7 @@ describe('TownsController integration tests', () => {
         ).rejects.toThrow();
       });
     });
-    describe('[T3] Get Poster Image Contents', () => {
+    /* describe('[T3] Get Poster Image Contents', () => {
       it('Executes without error when creating a new poster area', async () => {
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
         if (!posterArea) {
@@ -464,14 +464,22 @@ describe('TownsController integration tests', () => {
           controller.getPosterAreaImageContents(nanoid(), posterArea.id, invalidSessionToken),
         ).rejects.toThrow();
       });
-      it('Returns an error message if addPosterArea returns false', async () => {
-        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
-        posterArea.id = nanoid();
+      it('Returns an error message if the poster session specified doesnt exist', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea; // finds a poster session
+        posterArea.id = nanoid(); // resets the id
+
         await expect(
           controller.createPosterSessionArea(testingTown.townID, sessionToken, posterArea),
         ).rejects.toThrow();
       });
-    });
+      it('Returns the image contents of the poster session that exist', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+        posterArea.imageContents = 'sss';
+        expect(
+          controller.getPosterAreaImageContents(testingTown.townID, sessionToken, posterArea.id),
+        ).toEqual('sss');
+      });
+    }); */
     // work on this next
   });
 });

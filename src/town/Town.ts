@@ -19,6 +19,7 @@ import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
 import PosterSessionArea from './PosterSessionArea';
+import { isViewingArea, isPosterSessionArea } from '../TestUtils';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -139,6 +140,7 @@ export default class Town {
     // and only if the message has the same interactable id as the player
     socket.on('chatMessage', (message: ChatMessage) => {
       // fill in
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const test = message.body;
     });
 
@@ -156,18 +158,19 @@ export default class Town {
     // the interactableUpdate to the other players in the town. Also dispatches an
     // updateModel call to the viewingArea or posterSessionArea that corresponds to the interactable being
     // updated. Does not throw an error if the specified viewing area or poster session area does not exist.
-    socket.on('interactableUpdate', (update: Interactable): Player | void => {
+    // eslint-disable-next-line consistent-return
+    socket.on('interactableUpdate', (update: Interactable): void => {
       const changedInteractable = this._interactables.find(
         interactable => interactable.id === update.id,
       ) as PosterSessionArea & ViewingArea;
+      // eslint-disable-next-line prettier/prettier
       if (!changedInteractable) {
         return undefined;
       }
       changedInteractable.updateModel(update as PosterSessionArea & ViewingArea);
-
       newPlayer.townEmitter.emit('interactableUpdate', update);
-      return newPlayer;
     });
+    return newPlayer;
   }
 
   /**
