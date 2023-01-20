@@ -226,7 +226,7 @@ export class TownsController extends Controller {
       throw new InvalidParametersError('Invalid values specified');
     }
     const foundPoster = town.getInteractable(posterSessionId);
-    if (!isPosterSessionArea(foundPoster)) {
+    if (!foundPoster || !isPosterSessionArea(foundPoster)) {
       throw new InvalidParametersError('Invalid values specified');
     } else return foundPoster.imageContents;
   }
@@ -263,9 +263,13 @@ export class TownsController extends Controller {
     if (!posterContents) {
       throw new InvalidParametersError('Invalid values specified');
     } else {
-      const foundPoster = town.getInteractable(posterSessionId) as unknown as PosterSessionArea;
-      foundPoster.incrementStars();
-      return foundPoster.stars;
+      const foundPoster = town.getInteractable(posterSessionId) as PosterSessionArea;
+      if (!isPosterSessionArea(foundPoster) || !foundPoster.imageContents) {
+        throw new InvalidParametersError('Invalid values specified');
+      } else {
+        foundPoster.incrementStars();
+        return foundPoster.stars;
+      }
     }
   }
 

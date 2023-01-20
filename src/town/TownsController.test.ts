@@ -515,7 +515,7 @@ describe('TownsController integration tests', () => {
         posterArea.id = nanoid(); // resets the id
 
         await expect(
-          controller.getPosterAreaImageContents(testingTown.townID, posterArea.id, sessionToken),
+          controller.incrementPosterAreaStars(testingTown.townID, posterArea.id, sessionToken),
         ).rejects.toThrow();
       });
       it('Returns an error message if the poster session specified isnt a PosterSession', async () => {
@@ -532,8 +532,12 @@ describe('TownsController integration tests', () => {
           await controller.createViewingArea(testingTown.townID, sessionToken, newViewingArea);
         }
         await expect(
-          controller.getPosterAreaImageContents(testingTown.townID, viewingArea.id, sessionToken),
+          controller.incrementPosterAreaStars(testingTown.townID, viewingArea.id, sessionToken),
         ).rejects.toThrow();
+      });
+      it('Returns an error because the poster session specified doesnt have an image', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea; // finds a poster session
+        posterArea.id = nanoid(); // resets the id
       });
       it('Returns the image contents of the poster session that exist', async () => {
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
