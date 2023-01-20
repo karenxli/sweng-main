@@ -142,7 +142,8 @@ export default class Town {
     socket.on('chatMessage', (message: ChatMessage) => {
       // fill in
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const test = message.body;
+      const nearbyPlayers: Player[] = this._players.filter(p => p.id === message.interactableId);
+      socket.emit('chatMessage', message);
     });
 
     // Register an event listener for the client socket: if the client updates their

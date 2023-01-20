@@ -305,3 +305,28 @@ export class TownsController extends Controller {
     });
   }
 }
+
+/**
+ * it('Executes without error when creating a new viewing area', async () => {
+        const viewingArea = interactables.find(isViewingArea) as ViewingArea;
+        if (!viewingArea) {
+          fail('Expected at least one viewing area to be returned in the initial join data');
+        } else {
+          const newViewingArea: ViewingArea = {
+            elapsedTimeSec: 100,
+            id: viewingArea.id,
+            video: nanoid(),
+            isPlaying: true,
+          };
+          await controller.createViewingArea(testingTown.townID, sessionToken, newViewingArea);
+          // Check to see that the viewing area was successfully updated
+          const townEmitter = getBroadcastEmitterForTownID(testingTown.townID);
+          const updateMessage = getLastEmittedEvent(townEmitter, 'interactableUpdate');
+          if (isViewingArea(updateMessage)) {
+            expect(updateMessage).toEqual(newViewingArea);
+          } else {
+            fail('Expected an interactableUpdate to be dispatched with the new viewing area');
+          }
+        }
+      });
+ */

@@ -426,29 +426,7 @@ describe('TownsController integration tests', () => {
         ).rejects.toThrow();
       });
     });
-    /* describe('[T3] Get Poster Image Contents', () => {
-      it('Executes without error when creating a new poster area', async () => {
-        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
-        if (!posterArea) {
-          fail('Expected at least one poster area to be returned in the initial join data');
-        } else {
-          const newPosterArea: PosterSessionArea = {
-            id: posterArea.id,
-            stars: 0,
-            imageContents: 'sss',
-            title: nanoid(),
-          };
-          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
-          // Check to see that the viewing area was successfully updated
-          const townEmitter = getBroadcastEmitterForTownID(testingTown.townID);
-          const updateMessage = getLastEmittedEvent(townEmitter, 'interactableUpdate');
-          if (isPosterSessionArea(updateMessage)) {
-            expect(updateMessage).toEqual(newPosterArea);
-          } else {
-            fail('Expected an interactableUpdate to be dispatched with the new poster area');
-          }
-        }
-      });
+    describe('[T3] Get Poster Image Contents', () => {
       // this stays the same
       it('Returns an error message if the town ID is invalid', async () => {
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
@@ -474,12 +452,29 @@ describe('TownsController integration tests', () => {
       });
       it('Returns the image contents of the poster session that exist', async () => {
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
-        posterArea.imageContents = 'sss';
-        expect(
-          controller.getPosterAreaImageContents(testingTown.townID, sessionToken, posterArea.id),
-        ).toEqual('sss');
+        if (!posterArea) {
+          fail('Expected at least one poster area to be returned in the initial join data');
+        } else {
+          const newPosterArea: PosterSessionArea = {
+            id: posterArea.id,
+            stars: 0,
+            imageContents: 'sss',
+            title: nanoid(),
+          };
+          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
+          // check to see that the poster area session was correctly fetched
+          const townEmitter = getBroadcastEmitterForTownID(testingTown.townID);
+          const updateMessage = getLastEmittedEvent(townEmitter, 'interactableUpdate');
+          if (isPosterSessionArea(updateMessage)) {
+            expect(updateMessage).toEqual(newPosterArea);
+          } else {
+            fail('Expected an interactable Update to be dispatched with the postersession area');
+          }
+        }
       });
-    }); */
+    });
     // work on this next
   });
 });
+
+// "BcZ0PpDIozIM-DMgNg905"
