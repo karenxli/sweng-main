@@ -447,7 +447,24 @@ describe('TownsController integration tests', () => {
         posterArea.id = nanoid(); // resets the id
 
         await expect(
-          controller.createPosterSessionArea(testingTown.townID, sessionToken, posterArea),
+          controller.getPosterAreaImageContents(testingTown.townID, posterArea.id, sessionToken),
+        ).rejects.toThrow();
+      });
+      it('Returns an error message if the poster session specified isnt a PosterSession', async () => {
+        const viewingArea = interactables.find(isViewingArea) as ViewingArea;
+        if (!viewingArea) {
+          fail('Expected at least one viewing area to be returned in the initial join data');
+        } else {
+          const newViewingArea: ViewingArea = {
+            elapsedTimeSec: 100,
+            id: viewingArea.id,
+            video: nanoid(),
+            isPlaying: true,
+          };
+          await controller.createViewingArea(testingTown.townID, sessionToken, newViewingArea);
+        }
+        await expect(
+          controller.getPosterAreaImageContents(testingTown.townID, viewingArea.id, sessionToken),
         ).rejects.toThrow();
       });
       it('Returns the image contents of the poster session that exist', async () => {
@@ -464,7 +481,9 @@ describe('TownsController integration tests', () => {
           await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
           // check to see that the poster area session was correctly fetched
           const townEmitter = getBroadcastEmitterForTownID(testingTown.townID);
+          //          ^?
           const updateMessage = getLastEmittedEvent(townEmitter, 'interactableUpdate');
+          //          ^?
           if (isPosterSessionArea(updateMessage)) {
             expect(updateMessage).toEqual(newPosterArea);
           } else {
@@ -474,6 +493,73 @@ describe('TownsController integration tests', () => {
       });
     });
     // work on this next
+
+    describe('[T4] Increment Poster Star Count', () => {
+      // this stays the same
+      it('Returns an error message if the town ID is invalid', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+        await expect(
+          controller.incrementPosterAreaStars(nanoid(), posterArea.id, sessionToken),
+        ).rejects.toThrow();
+      });
+      it('Checks for a valid session token before fetching the poster contents', async () => {
+        const invalidSessionToken = nanoid();
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+
+        await expect(
+          controller.incrementPosterAreaStars(nanoid(), posterArea.id, invalidSessionToken),
+        ).rejects.toThrow();
+      });
+      it('Returns an error message if the poster session specified doesnt exist', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea; // finds a poster session
+        posterArea.id = nanoid(); // resets the id
+
+        await expect(
+          controller.getPosterAreaImageContents(testingTown.townID, posterArea.id, sessionToken),
+        ).rejects.toThrow();
+      });
+      it('Returns an error message if the poster session specified isnt a PosterSession', async () => {
+        const viewingArea = interactables.find(isViewingArea) as ViewingArea;
+        if (!viewingArea) {
+          fail('Expected at least one viewing area to be returned in the initial join data');
+        } else {
+          const newViewingArea: ViewingArea = {
+            elapsedTimeSec: 100,
+            id: viewingArea.id,
+            video: nanoid(),
+            isPlaying: true,
+          };
+          await controller.createViewingArea(testingTown.townID, sessionToken, newViewingArea);
+        }
+        await expect(
+          controller.getPosterAreaImageContents(testingTown.townID, viewingArea.id, sessionToken),
+        ).rejects.toThrow();
+      });
+      it('Returns the image contents of the poster session that exist', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+        if (!posterArea) {
+          fail('Expected at least one poster area to be returned in the initial join data');
+        } else {
+          const newPosterArea: PosterSessionArea = {
+            id: posterArea.id,
+            stars: 0,
+            imageContents: 'sss',
+            title: nanoid(),
+          };
+          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
+          // check to see that the poster area session was correctly fetched
+          const townEmitter = getBroadcastEmitterForTownID(testingTown.townID);
+          //          ^?
+          const updateMessage = getLastEmittedEvent(townEmitter, 'interactableUpdate');
+          //          ^?
+          if (isPosterSessionArea(updateMessage)) {
+            expect(updateMessage).toEqual(newPosterArea);
+          } else {
+            fail('Expected an interactable Update to be dispatched with the postersession area');
+          }
+        }
+      });
+    });
   });
 });
 

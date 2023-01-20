@@ -226,7 +226,7 @@ export class TownsController extends Controller {
       throw new InvalidParametersError('Invalid values specified');
     }
     const foundPoster = town.getInteractable(posterSessionId);
-    if (!foundPoster || !isPosterSessionArea(foundPoster)) {
+    if (!isPosterSessionArea(foundPoster)) {
       throw new InvalidParametersError('Invalid values specified');
     } else return foundPoster.imageContents;
   }
