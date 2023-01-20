@@ -19,7 +19,8 @@ import ConversationArea from './ConversationArea';
 import InteractableArea from './InteractableArea';
 import ViewingArea from './ViewingArea';
 import PosterSessionArea from './PosterSessionArea';
-import { isViewingArea, isPosterSessionArea } from '../TestUtils';
+import { isPosterSessionArea, isViewingArea } from '../TestUtils';
+// import { isViewingArea, isPosterSessionArea } from '../TestUtils';
 
 /**
  * The Town class implements the logic for each town: managing the various events that
@@ -160,14 +161,18 @@ export default class Town {
     // updated. Does not throw an error if the specified viewing area or poster session area does not exist.
     // eslint-disable-next-line consistent-return
     socket.on('interactableUpdate', (update: Interactable): void => {
-      const changedInteractable = this._interactables.find(
-        interactable => interactable.id === update.id,
-      ) as PosterSessionArea & ViewingArea;
-      // eslint-disable-next-line prettier/prettier
-      if (!changedInteractable) {
-        return undefined;
+      if (isPosterSessionArea(update)) {
+        const changedInteractable = this._interactables.find(
+          interactable => interactable.id === update.id,
+        ) as PosterSessionArea;
+        changedInteractable.updateModel(update as PosterSessionArea);
+      } else if (isViewingArea(update)) {
+        const changedInteractable = this._interactables.find(
+          interactable => interactable.id === update.id,
+        ) as ViewingArea;
+        changedInteractable.updateModel(update as ViewingArea);
       }
-      changedInteractable.updateModel(update as PosterSessionArea & ViewingArea);
+
       newPlayer.townEmitter.emit('interactableUpdate', update);
     });
     return newPlayer;
