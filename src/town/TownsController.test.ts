@@ -439,7 +439,8 @@ describe('TownsController integration tests', () => {
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
 
         await expect(
-          controller.getPosterAreaImageContents(nanoid(), posterArea.id, invalidSessionToken),
+          // eslint-disable-next-line prettier/prettier
+          controller.getPosterAreaImageContents(testingTown.townID, posterArea.id, invalidSessionToken),
         ).rejects.toThrow();
       });
       it('Returns an error message if the poster session specified doesnt exist', async () => {
