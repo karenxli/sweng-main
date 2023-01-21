@@ -983,7 +983,8 @@ describe('Town', () => {
       expectInitializingFromMapToThrowError(testingMaps.overlapping);
     });
     it('Throws an error if the object list is empty', async () => {
-      expectInitializingFromMapToThrowError(testingMaps.emptyObjects);
+      town.initializeFromMap(testingMaps.emptyObjects);
+      expect(town.interactables).toEqual([]);
     });
     it('Creates a ConversationArea instance for each region on the map', async () => {
       town.initializeFromMap(testingMaps.twoConv);
