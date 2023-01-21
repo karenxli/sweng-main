@@ -251,7 +251,7 @@ export class TownsController extends Controller {
     @Path() townID: string,
     @Path() posterSessionId: string,
     @Header('X-Session-Token') sessionToken: string,
-  ): Promise<number> {
+  ): Promise<number | undefined> {
     const town = this._townsStore.getTownByID(townID);
     if (!town) {
       throw new InvalidParametersError('Invalid values specified');

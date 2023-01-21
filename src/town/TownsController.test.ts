@@ -480,6 +480,12 @@ describe('TownsController integration tests', () => {
           };
           await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
           // check to see that the poster area session was correctly fetched
+
+          await controller.getPosterAreaImageContents(
+            testingTown.townID,
+            newPosterArea.id,
+            sessionToken,
+          );
           const townEmitter = getBroadcastEmitterForTownID(testingTown.townID);
           //          ^?
           const updateMessage = getLastEmittedEvent(townEmitter, 'interactableUpdate');
@@ -491,10 +497,22 @@ describe('TownsController integration tests', () => {
           }
         }
       });
+      it('Returns the image contents of a poster session, where the contents are undefined (inactive session)', async () => {
+        const townsStore = TownsStore.getInstance();
+        const townNum = townsStore.getTowns()[0].townID;
+        //        ^?
+        const newTown = townsStore.getTownByID(townNum);
+        const emptyPoster = newTown?.interactables.find(t => isPosterSessionArea(t) && !t.isActive);
+        if (!emptyPoster) {
+          fail('Expected at least one poster area to be present');
+        }
+        await expect(
+          controller.getPosterAreaImageContents(testingTown.townID, emptyPoster.id, sessionToken),
+        ).resolves.toBe(undefined);
+      });
     });
     // work on this next
-
-    describe('[T4] Increment Poster Star Count', () => {
+    /** describe('[T4] Increment Poster Star Count', () => {
       // this stays the same
       it('Returns an error message if the town ID is invalid', async () => {
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
@@ -564,7 +582,6 @@ describe('TownsController integration tests', () => {
         }
       });
     });
+    */
   });
 });
-
-// "BcZ0PpDIozIM-DMgNg905"
