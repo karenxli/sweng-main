@@ -438,17 +438,25 @@ describe('TownsController integration tests', () => {
         const invalidSessionToken = nanoid();
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
 
+        if (!posterArea) {
+          fail('Expected at least one poster area to be returned in the initial join data');
+        } else {
+          const newPosterArea: PosterSessionArea = {
+            id: posterArea.id,
+            stars: 0,
+            imageContents: 'sss',
+            title: nanoid(),
+          };
+          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
+        }
         await expect(
           // eslint-disable-next-line prettier/prettier
           controller.getPosterAreaImageContents(testingTown.townID, posterArea.id, invalidSessionToken),
         ).rejects.toThrow();
       });
       it('Returns an error message if the poster session specified doesnt exist', async () => {
-        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea; // finds a poster session
-        posterArea.id = nanoid(); // resets the id
-
         await expect(
-          controller.getPosterAreaImageContents(testingTown.townID, posterArea.id, sessionToken),
+          controller.getPosterAreaImageContents(testingTown.townID, nanoid(), sessionToken),
         ).rejects.toThrow();
       });
       it('Returns an error message if the poster session specified isnt a PosterSession', async () => {
@@ -513,7 +521,7 @@ describe('TownsController integration tests', () => {
       });
     });
     // work on this next
-    /** describe('[T4] Increment Poster Star Count', () => {
+    describe('[T4] Increment Poster Star Count', () => {
       // this stays the same
       it('Returns an error message if the town ID is invalid', async () => {
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
@@ -526,7 +534,8 @@ describe('TownsController integration tests', () => {
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
 
         await expect(
-          controller.incrementPosterAreaStars(nanoid(), posterArea.id, invalidSessionToken),
+          // eslint-disable-next-line prettier/prettier
+          controller.incrementPosterAreaStars(testingTown.townID, posterArea.id, invalidSessionToken),
         ).rejects.toThrow();
       });
       it('Returns an error message if the poster session specified doesnt exist', async () => {
@@ -537,7 +546,12 @@ describe('TownsController integration tests', () => {
           controller.incrementPosterAreaStars(testingTown.townID, posterArea.id, sessionToken),
         ).rejects.toThrow();
       });
-      it('Returns an error message if the poster session specified isnt a PosterSession', async () => {
+    });
+  });
+});
+
+/**
+ * it('Returns an error message if the poster session specified isnt a PosterSession', async () => {
         const viewingArea = interactables.find(isViewingArea) as ViewingArea;
         if (!viewingArea) {
           fail('Expected at least one viewing area to be returned in the initial join data');
@@ -554,10 +568,7 @@ describe('TownsController integration tests', () => {
           controller.incrementPosterAreaStars(testingTown.townID, viewingArea.id, sessionToken),
         ).rejects.toThrow();
       });
-      it('Returns an error because the poster session specified doesnt have an image', async () => {
-        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea; // finds a poster session
-        posterArea.id = nanoid(); // resets the id
-      });
+
       it('Returns the image contents of the poster session that exist', async () => {
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
         if (!posterArea) {
@@ -582,7 +593,4 @@ describe('TownsController integration tests', () => {
           }
         }
       });
-    });
-    */
-  });
-});
+ */

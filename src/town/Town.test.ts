@@ -72,6 +72,25 @@ const testingMaps: TestMapDict = {
       },
     ],
   },
+  emptyObjects: {
+    tiledversion: '1.9.0',
+    tileheight: 32,
+    tilesets: [],
+    tilewidth: 32,
+    type: 'map',
+    layers: [
+      {
+        id: 4,
+        name: 'Objects',
+        objects: [],
+        opacity: 1,
+        type: 'objectgroup',
+        visible: true,
+        x: 0,
+        y: 0,
+      },
+    ],
+  },
   overlapping: {
     tiledversion: '1.9.0',
     tileheight: 32,
@@ -962,6 +981,9 @@ describe('Town', () => {
     });
     it('Throws an error if there are overlapping objects', async () => {
       expectInitializingFromMapToThrowError(testingMaps.overlapping);
+    });
+    it('Throws an error if the object list is empty', async () => {
+      expectInitializingFromMapToThrowError(testingMaps.emptyObjects);
     });
     it('Creates a ConversationArea instance for each region on the map', async () => {
       town.initializeFromMap(testingMaps.twoConv);
