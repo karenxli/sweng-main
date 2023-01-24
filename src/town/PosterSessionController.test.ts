@@ -400,20 +400,16 @@ describe('TownsController integration tests', () => {
         ).rejects.toThrow();
       });
       it('Returns an error message if the poster session specified does not have an image', async () => {
-        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
-        if (!posterArea) {
-          fail('Expected at least one viewing area to be returned in the initial join data');
-        } else {
-          const newPosterArea: PosterSessionArea = {
-            id: posterArea.id,
-            stars: 2,
-            imageContents: undefined,
-            title: 'hello there.png',
-          };
-          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
+        const townsStore = TownsStore.getInstance();
+        const townNum = townsStore.getTowns()[0].townID;
+        //        ^?
+        const newTown = townsStore.getTownByID(townNum);
+        const emptyPoster = newTown?.interactables.find(t => isPosterSessionArea(t) && !t.isActive);
+        if (!emptyPoster) {
+          fail('Expected at least one poster area to be present');
         }
         await expect(
-          controller.incrementPosterAreaStars(testingTown.townID, posterArea.id, sessionToken),
+          controller.incrementPosterAreaStars(testingTown.townID, emptyPoster.id, sessionToken),
         ).rejects.toThrow();
       });
       it('Successful incrementing star count', async () => {
