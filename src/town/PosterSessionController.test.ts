@@ -382,23 +382,23 @@ describe('TownsController integration tests', () => {
           controller.incrementPosterAreaStars(testingTown.townID, invalidPosterSession, sessionToken),
         ).rejects.toThrow();
       });
-    });
-    it('Returns an error message if the poster session specified isnt a PosterSession', async () => {
-      const viewingArea = interactables.find(isViewingArea) as ViewingArea;
-      if (!viewingArea) {
-        fail('Expected at least one viewing area to be returned in the initial join data');
-      } else {
-        const newViewingArea: ViewingArea = {
-          elapsedTimeSec: 100,
-          id: viewingArea.id,
-          video: nanoid(),
-          isPlaying: true,
-        };
-        await controller.createViewingArea(testingTown.townID, sessionToken, newViewingArea);
-      }
-      await expect(
-        controller.incrementPosterAreaStars(testingTown.townID, viewingArea.id, sessionToken),
-      ).rejects.toThrow();
+      it('Returns an error message if the poster session specified isnt a PosterSession', async () => {
+        const viewingArea = interactables.find(isViewingArea) as ViewingArea;
+        if (!viewingArea) {
+          fail('Expected at least one viewing area to be returned in the initial join data');
+        } else {
+          const newViewingArea: ViewingArea = {
+            elapsedTimeSec: 100,
+            id: viewingArea.id,
+            video: nanoid(),
+            isPlaying: true,
+          };
+          await controller.createViewingArea(testingTown.townID, sessionToken, newViewingArea);
+        }
+        await expect(
+          controller.incrementPosterAreaStars(testingTown.townID, viewingArea.id, sessionToken),
+        ).rejects.toThrow();
+      });
     });
   });
 });
