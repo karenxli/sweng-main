@@ -399,6 +399,40 @@ describe('TownsController integration tests', () => {
           controller.incrementPosterAreaStars(testingTown.townID, viewingArea.id, sessionToken),
         ).rejects.toThrow();
       });
+      it('Returns an error message if the poster session specified does not have an image', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+        if (!posterArea) {
+          fail('Expected at least one viewing area to be returned in the initial join data');
+        } else {
+          const newPosterArea: PosterSessionArea = {
+            id: posterArea.id,
+            stars: 2,
+            imageContents: undefined,
+            title: 'hello there.png',
+          };
+          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
+        }
+        await expect(
+          controller.incrementPosterAreaStars(testingTown.townID, posterArea.id, sessionToken),
+        ).rejects.toThrow();
+      });
+      it('Successful incrementing star count', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+        if (!posterArea) {
+          fail('Expected at least one viewing area to be returned in the initial join data');
+        } else {
+          const newPosterArea: PosterSessionArea = {
+            id: posterArea.id,
+            stars: 2,
+            imageContents: 'obi wan kenobi getting the shit beaten out of him',
+            title: 'sad_wet_rat_man.png',
+          };
+          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
+        }
+        // eslint-disable-next-line prettier/prettier
+        const newStars = controller.incrementPosterAreaStars(testingTown.townID, posterArea.id, sessionToken)
+        expect(newStars).resolves.toEqual(3);
+      });
     });
   });
 });
