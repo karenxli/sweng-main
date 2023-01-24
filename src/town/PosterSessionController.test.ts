@@ -283,15 +283,21 @@ describe('TownsController integration tests', () => {
           await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
         }
         await expect(
-          // eslint-disable-next-line prettier/prettier
-          controller.getPosterAreaImageContents(testingTown.townID, posterArea.id, invalidSessionToken),
+          controller.getPosterAreaImageContents(
+            testingTown.townID,
+            posterArea.id,
+            invalidSessionToken,
+          ),
         ).rejects.toThrow();
       });
       it('Returns an error message if the poster session specified doesnt exist', async () => {
         const invalidPosterSession = nanoid();
         await expect(
-          // eslint-disable-next-line prettier/prettier
-          controller.getPosterAreaImageContents(testingTown.townID, invalidPosterSession, sessionToken),
+          controller.getPosterAreaImageContents(
+            testingTown.townID,
+            invalidPosterSession,
+            sessionToken,
+          ),
         ).rejects.toThrow();
       });
       it('Returns an error message if the poster session specified isnt a PosterSession', async () => {
@@ -370,16 +376,22 @@ describe('TownsController integration tests', () => {
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
 
         await expect(
-          // eslint-disable-next-line prettier/prettier
-          controller.incrementPosterAreaStars(testingTown.townID, posterArea.id, invalidSessionToken),
+          controller.incrementPosterAreaStars(
+            testingTown.townID,
+            posterArea.id,
+            invalidSessionToken,
+          ),
         ).rejects.toThrow();
       });
       it('Returns an error message if the poster session specified doesnt exist', async () => {
         const invalidPosterSession = nanoid();
 
         await expect(
-          // eslint-disable-next-line prettier/prettier
-          controller.incrementPosterAreaStars(testingTown.townID, invalidPosterSession, sessionToken),
+          controller.incrementPosterAreaStars(
+            testingTown.townID,
+            invalidPosterSession,
+            sessionToken,
+          ),
         ).rejects.toThrow();
       });
       it('Returns an error message if the poster session specified isnt a PosterSession', async () => {
@@ -425,8 +437,11 @@ describe('TownsController integration tests', () => {
           };
           await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
         }
-        // eslint-disable-next-line prettier/prettier
-        const newStars = controller.incrementPosterAreaStars(testingTown.townID, posterArea.id, sessionToken)
+        const newStars = controller.incrementPosterAreaStars(
+          testingTown.townID,
+          posterArea.id,
+          sessionToken,
+        );
         expect(newStars).resolves.toEqual(3);
       });
     });
