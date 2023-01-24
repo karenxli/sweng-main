@@ -1,11 +1,22 @@
 import { DeepMockProxy, mockDeep } from 'jest-mock-extended';
 import { nanoid } from 'nanoid';
 import { readFileSync } from 'fs';
-// eslint-disable-next-line prettier/prettier
-import { Interactable, TownEmitter, PosterSessionArea, ViewingArea } from '../types/CoveyTownSocket';
+
+import {
+  Interactable,
+  TownEmitter,
+  PosterSessionArea,
+  ViewingArea,
+} from '../types/CoveyTownSocket';
 import TownsStore from '../lib/TownsStore';
-// eslint-disable-next-line prettier/prettier
-import { getLastEmittedEvent, mockPlayer, MockedPlayer, isPosterSessionArea, isViewingArea } from '../TestUtils';
+
+import {
+  getLastEmittedEvent,
+  mockPlayer,
+  MockedPlayer,
+  isPosterSessionArea,
+  isViewingArea,
+} from '../TestUtils';
 import { TownsController } from './TownsController';
 
 interface TestTownData {
@@ -349,8 +360,9 @@ describe('TownsController integration tests', () => {
       // this stays the same
       it('Returns an error message if the town ID is invalid', async () => {
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+        const invalidTown = nanoid();
         await expect(
-          controller.incrementPosterAreaStars(nanoid(), posterArea.id, sessionToken),
+          controller.incrementPosterAreaStars(invalidTown, posterArea.id, sessionToken),
         ).rejects.toThrow();
       });
       it('Checks for a valid session token before fetching the poster contents', async () => {
@@ -363,13 +375,30 @@ describe('TownsController integration tests', () => {
         ).rejects.toThrow();
       });
       it('Returns an error message if the poster session specified doesnt exist', async () => {
-        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea; // finds a poster session
-        posterArea.id = nanoid(); // resets the id
+        const invalidPosterSession = nanoid();
 
         await expect(
-          controller.incrementPosterAreaStars(testingTown.townID, posterArea.id, sessionToken),
+          // eslint-disable-next-line prettier/prettier
+          controller.incrementPosterAreaStars(testingTown.townID, invalidPosterSession, sessionToken),
         ).rejects.toThrow();
       });
+    });
+    it('Returns an error message if the poster session specified isnt a PosterSession', async () => {
+      const viewingArea = interactables.find(isViewingArea) as ViewingArea;
+      if (!viewingArea) {
+        fail('Expected at least one viewing area to be returned in the initial join data');
+      } else {
+        const newViewingArea: ViewingArea = {
+          elapsedTimeSec: 100,
+          id: viewingArea.id,
+          video: nanoid(),
+          isPlaying: true,
+        };
+        await controller.createViewingArea(testingTown.townID, sessionToken, newViewingArea);
+      }
+      await expect(
+        controller.incrementPosterAreaStars(testingTown.townID, viewingArea.id, sessionToken),
+      ).rejects.toThrow();
     });
   });
 });

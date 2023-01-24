@@ -259,17 +259,14 @@ export class TownsController extends Controller {
     if (!town?.getPlayerBySessionToken(sessionToken)) {
       throw new InvalidParametersError('Invalid values specified');
     }
-    const posterContents = this.getPosterAreaImageContents(townID, posterSessionId, sessionToken);
-    if (!posterContents) {
+    // grab the posterSession
+
+    const foundPoster = town.getInteractable(posterSessionId) as PosterSessionArea;
+    if (!foundPoster.imageContents || !isPosterSessionArea(foundPoster)) {
       throw new InvalidParametersError('Invalid values specified');
     } else {
-      const foundPoster = town.getInteractable(posterSessionId) as PosterSessionArea;
-      if (!isPosterSessionArea(foundPoster) || !foundPoster.imageContents) {
-        throw new InvalidParametersError('Invalid values specified');
-      } else {
-        foundPoster.incrementStars();
-        return foundPoster.stars;
-      }
+      foundPoster.incrementStars();
+      return foundPoster.stars;
     }
   }
 
