@@ -8,28 +8,43 @@ import {
 import InteractableArea from './InteractableArea';
 
 export default class PosterSessionArea extends InteractableArea {
-  // add fields
+  // private PosterSessionArea fields; all can be undefined
+  // image contents
   private _poster?: string;
 
+  // number of stars
   private _stars: number;
 
+  // title name
   private _title?: string;
 
   private readonly _coordinates: BoundingBox;
   /* An emitter that can be used to broadcast messages to all players in this town */
 
+  /**
+   * Gets the number of stars in the PosterSessionArea.
+   */
   public get stars() {
     return this._stars;
   }
 
+  /**
+   * Gets the title of the PosterSessionArea.
+   */
   public get title() {
     return this._title;
   }
 
+  /**
+   * Gets the image contents of the PosterSessionArea.
+   */
   public get imageContents() {
     return this._poster;
   }
 
+  /**
+   * Gets the coordinates of the PosterSessionArea.
+   */
   public get coordinates() {
     return this._coordinates;
   }

@@ -141,8 +141,6 @@ export default class Town {
     // and only if the message has the same interactable id as the player
     socket.on('chatMessage', (message: ChatMessage) => {
       // fill in
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const nearbyPlayers: Player[] = this._players.filter(p => p.id === message.interactableId);
       socket.emit('chatMessage', message);
     });
 

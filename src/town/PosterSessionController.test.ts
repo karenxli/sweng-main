@@ -366,15 +366,35 @@ describe('TownsController integration tests', () => {
       // this stays the same
       it('Returns an error message if the town ID is invalid', async () => {
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
-        const invalidTown = nanoid();
+        if (!posterArea) {
+          fail('Expected at least one viewing area to be returned in the initial join data');
+        } else {
+          const newPosterArea: PosterSessionArea = {
+            id: posterArea.id,
+            stars: 2,
+            imageContents: 'obi wan kenobi getting the shit beaten out of him',
+            title: 'sad_wet_rat_man.png',
+          };
+          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
+        }
         await expect(
-          controller.incrementPosterAreaStars(invalidTown, posterArea.id, sessionToken),
+          controller.incrementPosterAreaStars(nanoid(), posterArea.id, sessionToken),
         ).rejects.toThrow();
       });
       it('Checks for a valid session token before fetching the poster contents', async () => {
         const invalidSessionToken = nanoid();
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
-
+        if (!posterArea) {
+          fail('Expected at least one viewing area to be returned in the initial join data');
+        } else {
+          const newPosterArea: PosterSessionArea = {
+            id: posterArea.id,
+            stars: 2,
+            imageContents: 'obi wan kenobi getting the shit beaten out of him',
+            title: 'sad_wet_rat_man.png',
+          };
+          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
+        }
         await expect(
           controller.incrementPosterAreaStars(
             testingTown.townID,
@@ -384,14 +404,21 @@ describe('TownsController integration tests', () => {
         ).rejects.toThrow();
       });
       it('Returns an error message if the poster session specified doesnt exist', async () => {
-        const invalidPosterSession = nanoid();
-
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea; // finds a poster session
+        if (!posterArea) {
+          fail('Expected at least one viewing area to be returned in the initial join data');
+        } else {
+          const newPosterArea: PosterSessionArea = {
+            id: posterArea.id,
+            stars: 2,
+            imageContents: 'obi wan kenobi getting the shit beaten out of him',
+            title: 'sad_wet_rat_man.png',
+          };
+          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
+        }
+        posterArea.id = nanoid(); // resets the id
         await expect(
-          controller.incrementPosterAreaStars(
-            testingTown.townID,
-            invalidPosterSession,
-            sessionToken,
-          ),
+          controller.incrementPosterAreaStars(testingTown.townID, posterArea.id, sessionToken),
         ).rejects.toThrow();
       });
       it('Returns an error message if the poster session specified isnt a PosterSession', async () => {
@@ -411,12 +438,8 @@ describe('TownsController integration tests', () => {
           controller.incrementPosterAreaStars(testingTown.townID, viewingArea.id, sessionToken),
         ).rejects.toThrow();
       });
-      it('Returns an error message if the poster session specified does not have an image', async () => {
-        const townsStore = TownsStore.getInstance();
-        const townNum = townsStore.getTowns()[0].townID;
-        //        ^?
-        const newTown = townsStore.getTownByID(townNum);
-        const emptyPoster = newTown?.interactables.find(t => isPosterSessionArea(t) && !t.isActive);
+      it('Returns an error message if the posterSession does not have image contents', async () => {
+        const emptyPoster = interactables.find(t => isPosterSessionArea(t) && !t.imageContents);
         if (!emptyPoster) {
           fail('Expected at least one poster area to be present');
         }
@@ -424,7 +447,7 @@ describe('TownsController integration tests', () => {
           controller.incrementPosterAreaStars(testingTown.townID, emptyPoster.id, sessionToken),
         ).rejects.toThrow();
       });
-      it('Successful incrementing star count', async () => {
+      it('Successful result', async () => {
         const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
         if (!posterArea) {
           fail('Expected at least one viewing area to be returned in the initial join data');
@@ -437,12 +460,30 @@ describe('TownsController integration tests', () => {
           };
           await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
         }
-        const newStars = controller.incrementPosterAreaStars(
-          testingTown.townID,
-          posterArea.id,
-          sessionToken,
-        );
-        expect(newStars).resolves.toEqual(3);
+        await expect(
+          controller.incrementPosterAreaStars(testingTown.townID, posterArea.id, sessionToken),
+        ).resolves.toBe(3);
+      });
+      it('Successful result, but twice', async () => {
+        const posterArea = interactables.find(isPosterSessionArea) as PosterSessionArea;
+        if (!posterArea) {
+          fail('Expected at least one viewing area to be returned in the initial join data');
+        } else {
+          const newPosterArea: PosterSessionArea = {
+            id: posterArea.id,
+            stars: 67,
+            imageContents: 'anakin skywalker no talk me im angy',
+            title: 'not_just_the_men_but_the_women_and_children_too.png',
+          };
+          await controller.createPosterSessionArea(testingTown.townID, sessionToken, newPosterArea);
+        }
+        await expect(
+          controller.incrementPosterAreaStars(testingTown.townID, posterArea.id, sessionToken),
+        ).resolves.toBe(68);
+        // call it... again!
+        await expect(
+          controller.incrementPosterAreaStars(testingTown.townID, posterArea.id, sessionToken),
+        ).resolves.toBe(69);
       });
     });
   });
